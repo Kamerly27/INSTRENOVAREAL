@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Matrículas | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Matrículas</h1>
+    <p>Inscribir estudiantes en cursos activos del Instituto Renova</p>
+</div>
+
+<div class="actions-bar">
+    <a href="{{ url_for('admin.crear_matricula') }}" class="btn-primary">
+        <i class='bx bxs-user-plus'></i>
+        Nueva matrícula
+    </a>
+</div>
+
+<div class="table-card">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Estudiante</th>
+                <th>Curso</th>
+                <th>Fecha matrícula</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for matricula in matriculas %}
+            <tr>
+                <td>{{ matricula.estudiante.nombre }} {{ matricula.estudiante.apellido }}</td>
+                <td>{{ matricula.curso.nombre }}</td>
+                <td>{{ matricula.fecha_matricula.strftime('%d/%m/%Y') }}</td>
+                <td>{{ matricula.estado }}</td>
+                <td>Editar</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="empty-table">
+                    No hay matrículas registradas todavía.
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

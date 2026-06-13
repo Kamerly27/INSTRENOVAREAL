@@ -1,0 +1,111 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Actividades | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Actividades del Módulo</h1>
+    <p>{{ modulo.titulo }}</p>
+</div>
+
+<div class="actions-bar">
+    <a href="{{ url_for('docente.crear_actividad', modulo_id=modulo.id) }}" class="btn-primary">
+        <i class='bx bx-plus'></i>
+        Crear actividad
+    </a>
+</div>
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Fecha de entrega</th>
+                <th>Fecha creación</th>
+                <th>Acciones</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for actividad in actividades %}
+
+            <tr>
+
+                <td>
+                    {{ actividad.titulo }}
+                </td>
+
+                <td>
+                    {{ actividad.descripcion }}
+                </td>
+
+                <td>
+
+                    {% if actividad.fecha_entrega %}
+
+                        {{ actividad.fecha_entrega.strftime('%d/%m/%Y') }}
+
+                    {% else %}
+
+                        Sin definir
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+                    {{ actividad.fecha_creacion.strftime('%d/%m/%Y') }}
+                </td>
+
+                <td>
+
+                    <a
+                    href="{{ url_for('docente.editar_actividad', id=actividad.id) }}"
+                    class="btn-small">
+
+                        Editar
+
+                    </a>
+
+                    <a
+                    href="{{ url_for('docente.eliminar_actividad', id=actividad.id) }}"
+                    class="btn-small">
+
+                        Eliminar
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+        {% else %}
+
+            <tr>
+
+                <td colspan="5" class="empty-table">
+
+                    Este módulo aún no tiene actividades.
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

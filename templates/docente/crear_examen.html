@@ -1,0 +1,94 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Crear Examen | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Crear Examen</h1>
+    <p>{{ modulo.titulo }}</p>
+</div>
+
+<div class="form-card">
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Título del examen</label>
+                <input
+                type="text"
+                name="titulo"
+                required>
+            </div>
+
+            <div class="form-group">
+                <label>Fecha de inicio</label>
+                <input
+                type="date"
+                name="fecha_inicio">
+            </div>
+
+            <div class="form-group">
+                <label>Fecha de cierre</label>
+                <input
+                type="date"
+                name="fecha_fin">
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+
+                <select
+                name="activo"
+                required>
+
+                    <option value="1">
+                        Activo
+                    </option>
+
+                    <option value="0">
+                        Inactivo
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group full">
+                <label>Descripción</label>
+
+                <textarea
+                name="descripcion"
+                required></textarea>
+
+            </div>
+
+            <div class="form-group full">
+                <label>Enlace de Google Forms</label>
+
+                <input
+                type="text"
+                name="enlace"
+                placeholder="https://docs.google.com/forms/...">
+
+            </div>
+
+        </div>
+
+        <button
+        type="submit"
+        class="btn-primary">
+
+            Crear examen
+
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

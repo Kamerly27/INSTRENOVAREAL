@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Enviar Mensaje | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Enviar Mensaje</h1>
+    <p>Comunícate con docentes o administración</p>
+</div>
+
+<div class="form-card">
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Destinatario</label>
+
+                <select name="destinatario_id" required>
+                    <option value="">Seleccione un usuario</option>
+
+                    {% for usuario in usuarios %}
+                    <option value="{{ usuario.id }}">
+                        {{ usuario.nombre }} {{ usuario.apellido }} - {{ usuario.rol }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Asunto</label>
+                <input type="text" name="asunto" required>
+            </div>
+
+            <div class="form-group full">
+                <label>Mensaje</label>
+                <textarea name="contenido" required></textarea>
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Enviar mensaje
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

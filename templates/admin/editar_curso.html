@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Editar Curso | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Editar Curso</h1>
+    <p>Actualizar información del programa académico</p>
+</div>
+
+<div class="form-card">
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Nombre del curso</label>
+                <input type="text" name="nombre" value="{{ curso.nombre }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Docente asignado</label>
+
+                <select name="docente_id" required>
+                    {% for docente in docentes %}
+                    <option value="{{ docente.id }}" {% if curso.docente_id == docente.id %}selected{% endif %}>
+                        {{ docente.nombre }} {{ docente.apellido }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+
+                <select name="activo" required>
+                    <option value="1" {% if curso.activo %}selected{% endif %}>Activo</option>
+                    <option value="0" {% if not curso.activo %}selected{% endif %}>Inactivo</option>
+                </select>
+            </div>
+
+            <div class="form-group full">
+                <label>Descripción</label>
+                <textarea name="descripcion" required>{{ curso.descripcion }}</textarea>
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Guardar cambios
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

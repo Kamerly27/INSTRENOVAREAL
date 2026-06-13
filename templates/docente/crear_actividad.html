@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Crear Actividad | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Crear Actividad</h1>
+    <p>{{ modulo.titulo }}</p>
+</div>
+
+<div class="form-card">
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Título de la actividad</label>
+                <input type="text" name="titulo" required>
+            </div>
+
+            <div class="form-group">
+                <label>Fecha de entrega</label>
+                <input type="date" name="fecha_entrega">
+            </div>
+
+            <div class="form-group full">
+                <label>Descripción</label>
+                <textarea name="descripcion" required></textarea>
+            </div>
+
+            <div class="form-group full">
+                <label>Archivo o enlace de apoyo</label>
+                <input type="text" name="archivo_url" placeholder="Enlace de Drive, PDF o recurso">
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Crear actividad
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

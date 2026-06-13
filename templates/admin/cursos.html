@@ -1,0 +1,121 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Cursos | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Gestión de Cursos</h1>
+    <p>Administrar programas académicos</p>
+</div>
+
+<div class="actions-bar">
+
+    <a href="{{ url_for('admin.crear_curso') }}"
+    class="btn-primary">
+
+        <i class='bx bx-plus'></i>
+
+        Crear curso
+
+    </a>
+
+</div>
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Curso</th>
+                <th>Docente</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for curso in cursos %}
+
+            <tr>
+
+                <td>
+
+                    {{ curso.nombre }}
+
+                </td>
+
+                <td>
+
+                    {% if curso.docente %}
+                        {{ curso.docente.nombre }}
+                        {{ curso.docente.apellido }}
+                    {% else %}
+                        Sin docente
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if curso.activo %}
+                        Activo
+                    {% else %}
+                        Inactivo
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <a
+                    href="{{ url_for('admin.editar_curso', id=curso.id) }}"
+                    class="btn-small">
+
+                        Editar
+
+                    </a>
+
+                    <a
+                    href="{{ url_for('admin.eliminar_curso', id=curso.id) }}"
+                    class="btn-small danger"
+                    onclick="return confirm('¿Seguro que deseas eliminar este curso?');">
+
+                        Eliminar
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+        {% else %}
+
+            <tr>
+
+                <td colspan="4"
+                class="empty-table">
+
+                    No hay cursos registrados.
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

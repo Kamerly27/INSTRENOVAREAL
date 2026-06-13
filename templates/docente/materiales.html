@@ -1,0 +1,109 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Materiales | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Materiales del Módulo</h1>
+    <p>{{ modulo.titulo }}</p>
+</div>
+
+<div class="actions-bar">
+    <a href="{{ url_for('docente.crear_material', modulo_id=modulo.id) }}" class="btn-primary">
+        <i class='bx bx-plus'></i>
+        Crear material
+    </a>
+</div>
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for material in materiales %}
+
+            <tr>
+
+                <td>
+                    {{ material.titulo }}
+                </td>
+
+                <td>
+                    {{ material.descripcion }}
+                </td>
+
+                <td>
+                    {{ material.fecha_creacion.strftime('%d/%m/%Y') }}
+                </td>
+
+                <td>
+
+                    {% if material.enlace %}
+
+                        <a
+                        href="{{ material.enlace }}"
+                        target="_blank"
+                        class="btn-small">
+
+                            Ver
+
+                        </a>
+
+                    {% endif %}
+
+                    <a
+                    href="{{ url_for('docente.editar_material', id=material.id) }}"
+                    class="btn-small">
+
+                        Editar
+
+                    </a>
+
+                    <a
+                    href="{{ url_for('docente.eliminar_material', id=material.id) }}"
+                    class="btn-small">
+
+                        Eliminar
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+        {% else %}
+
+            <tr>
+
+                <td colspan="4" class="empty-table">
+
+                    Este módulo aún no tiene materiales.
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

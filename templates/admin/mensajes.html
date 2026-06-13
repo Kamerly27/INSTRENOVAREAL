@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Mensajes | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Mensajes</h1>
+    <p>Enviar comunicaciones institucionales a docentes y estudiantes</p>
+</div>
+
+<div class="actions-bar">
+    <a href="{{ url_for('admin.enviar_mensaje') }}" class="btn-primary">
+        <i class='bx bxs-message-square-add'></i>
+        Nuevo mensaje
+    </a>
+</div>
+
+<div class="table-card">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Asunto</th>
+                <th>Destinatario</th>
+                <th>Rol</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for mensaje in mensajes %}
+            <tr>
+                <td>{{ mensaje.asunto }}</td>
+
+                <td>
+                    {{ mensaje.destinatario.nombre }}
+                    {{ mensaje.destinatario.apellido }}
+                </td>
+
+                <td>{{ mensaje.destinatario.rol }}</td>
+
+                <td>{{ mensaje.fecha_envio.strftime('%d/%m/%Y') }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4" class="empty-table">
+                    No hay mensajes registrados todavía.
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

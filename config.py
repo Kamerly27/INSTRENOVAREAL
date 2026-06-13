@@ -1,0 +1,12 @@
+import os
+
+class Config:
+    SECRET_KEY = 'renova_secret_key'
+
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///renova.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # CLOUDINARY
+    CLOUDINARY_CLOUD_NAME = 'TU_CLOUD_NAME'
+    CLOUDINARY_API_KEY = 'TU_API_KEY'
+    CLOUDINARY_API_SECRET = 'TU_API_SECRET'

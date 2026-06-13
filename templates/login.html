@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+    <title>RENOVA</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <div class="encabezado">
+
+        <img src="{{ url_for('static', filename='logo.png') }}"
+        class="logo-principal">
+
+        <h1>RENOVA</h1>
+
+        <p>
+            Plataforma Educativa Virtual
+        </p>
+
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+
+            <h2>Administrador</h2>
+
+            <p>
+                Gestión institucional completa.
+            </p>
+
+            <a href="/login/admin">
+                Ingresar
+            </a>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Docentes</h2>
+
+            <p>
+                Gestión académica y contenidos.
+            </p>
+
+            <a href="/login/docente">
+                Ingresar
+            </a>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Estudiantes</h2>
+
+            <p>
+                Acceso a cursos y certificados.
+            </p>
+
+            <a href="/login/estudiante">
+                Ingresar
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

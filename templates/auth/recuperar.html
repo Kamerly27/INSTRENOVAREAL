@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+            Instituto Renova
+        {% endblock %}
+    </title>
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- ICONOS -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
+    rel='stylesheet'>
+
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    {% include 'components/sidebar.html' %}
+
+    <!-- CONTENIDO -->
+    <main class="main-content">
+
+        <!-- NAVBAR -->
+        {% include 'components/navbar.html' %}
+
+        <!-- CONTENIDO DINÁMICO -->
+        <section class="content">
+
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+    </main>
+
+</body>
+</html>

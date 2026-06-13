@@ -1,0 +1,77 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Editar Usuario | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Editar Usuario</h1>
+    <p>Actualizar información del usuario</p>
+</div>
+
+<div class="form-card">
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" name="nombre" value="{{ usuario.nombre }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Apellido</label>
+                <input type="text" name="apellido" value="{{ usuario.apellido }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Tipo de documento</label>
+                <select name="tipo_documento" required>
+                    <option value="CC" {% if usuario.tipo_documento == 'CC' %}selected{% endif %}>Cédula de ciudadanía</option>
+                    <option value="TI" {% if usuario.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta de identidad</option>
+                    <option value="CE" {% if usuario.tipo_documento == 'CE' %}selected{% endif %}>Cédula de extranjería</option>
+                    <option value="PASAPORTE" {% if usuario.tipo_documento == 'PASAPORTE' %}selected{% endif %}>Pasaporte</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Número de documento</label>
+                <input type="text" name="numero_documento" value="{{ usuario.numero_documento or '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Correo institucional</label>
+                <input type="email" name="correo" value="{{ usuario.correo }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Rol</label>
+                <select name="rol" required>
+                    <option value="admin" {% if usuario.rol == 'admin' %}selected{% endif %}>Administrador</option>
+                    <option value="docente" {% if usuario.rol == 'docente' %}selected{% endif %}>Docente</option>
+                    <option value="estudiante" {% if usuario.rol == 'estudiante' %}selected{% endif %}>Estudiante</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+                <select name="activo" required>
+                    <option value="1" {% if usuario.activo %}selected{% endif %}>Activo</option>
+                    <option value="0" {% if not usuario.activo %}selected{% endif %}>Inactivo</option>
+                </select>
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Guardar cambios
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Crear Usuario | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1>Crear Usuario</h1>
+
+    <p>
+        Registrar administradores, docentes y estudiantes
+    </p>
+
+</div>
+
+<div class="form-card">
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Nombre</label>
+
+                <input
+                type="text"
+                name="nombre"
+                required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Apellido</label>
+
+                <input
+                type="text"
+                name="apellido"
+                required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Tipo de documento</label>
+
+                <select
+                name="tipo_documento"
+                required>
+
+                    <option value="">
+                        Seleccione
+                    </option>
+
+                    <option value="CC">
+                        Cédula de ciudadanía
+                    </option>
+
+                    <option value="TI">
+                        Tarjeta de identidad
+                    </option>
+
+                    <option value="CE">
+                        Cédula de extranjería
+                    </option>
+
+                    <option value="PASAPORTE">
+                        Pasaporte
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Número de documento</label>
+
+                <input
+                type="text"
+                name="numero_documento"
+                required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Correo institucional</label>
+
+                <input
+                type="email"
+                name="correo"
+                required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Contraseña</label>
+
+                <input
+                type="password"
+                name="password"
+                required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Rol</label>
+
+                <select
+                name="rol"
+                required>
+
+                    <option value="">
+                        Seleccione un rol
+                    </option>
+
+                    <option value="admin">
+                        Administrador
+                    </option>
+
+                    <option value="docente">
+                        Docente
+                    </option>
+
+                    <option value="estudiante">
+                        Estudiante
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <button
+        type="submit"
+        class="btn-primary">
+
+            Crear usuario
+
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

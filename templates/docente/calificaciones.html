@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Calificaciones | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Calificaciones</h1>
+    <p>{{ examen.titulo }}</p>
+</div>
+
+<div class="actions-bar">
+    <a href="{{ url_for('docente.crear_calificacion', examen_id=examen.id) }}" class="btn-primary">
+        <i class='bx bx-plus'></i>
+        Registrar calificación
+    </a>
+</div>
+
+<div class="table-card">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Estudiante</th>
+                <th>Nota</th>
+                <th>Observación</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for calificacion in calificaciones %}
+            <tr>
+                <td>
+                    {{ calificacion.estudiante.nombre }}
+                    {{ calificacion.estudiante.apellido }}
+                </td>
+
+                <td>{{ calificacion.nota }}</td>
+
+                <td>{{ calificacion.observacion }}</td>
+
+                <td>{{ calificacion.fecha_calificacion.strftime('%d/%m/%Y') }}</td>
+
+                <td>
+                    <a href="{{ url_for('docente.editar_calificacion', id=calificacion.id) }}" class="btn-small">
+                        Editar
+                    </a>
+
+                    <a href="{{ url_for('docente.eliminar_calificacion', id=calificacion.id) }}" class="btn-small">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5" class="empty-table">
+                    Este examen aún no tiene calificaciones registradas.
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

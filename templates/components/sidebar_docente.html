@@ -1,0 +1,61 @@
+<aside class="sidebar">
+
+    <div class="logo">
+
+        <img
+        src="{{ url_for('static', filename='img/logo.png') }}"
+        alt="Instituto Renova">
+
+        <h2>RENOVA</h2>
+
+    </div>
+
+    <ul class="menu">
+
+        <li>
+
+            <a href="{{ url_for('docente.dashboard') }}">
+
+                <i class='bx bxs-dashboard'></i>
+                Panel Docente
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="{{ url_for('docente.dashboard') }}">
+
+                <i class='bx bxs-book-open'></i>
+                Mis Cursos
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="{{ url_for('docente.mensajes') }}">
+
+                <i class='bx bxs-message-detail'></i>
+                Mensajes
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="{{ url_for('auth.logout') }}">
+
+                <i class='bx bx-log-out'></i>
+                Cerrar sesión
+
+            </a>
+
+        </li>
+
+    </ul>
+
+</aside>

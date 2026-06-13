@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Editar Material | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Editar Material</h1>
+    <p>{{ modulo.titulo }}</p>
+</div>
+
+<div class="form-card">
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Título del material</label>
+                <input
+                type="text"
+                name="titulo"
+                value="{{ material.titulo }}"
+                required>
+            </div>
+
+            <div class="form-group">
+                <label>Enlace o video</label>
+                <input
+                type="url"
+                name="enlace"
+                value="{{ material.enlace }}">
+            </div>
+
+            <div class="form-group full">
+                <label>Descripción</label>
+                <textarea
+                name="descripcion"
+                required>{{ material.descripcion }}</textarea>
+            </div>
+
+            <div class="form-group full">
+                <label>Archivo PDF / guía / recurso</label>
+                <input
+                type="text"
+                name="archivo"
+                value="{{ material.archivo }}">
+            </div>
+
+        </div>
+
+        <button
+        type="submit"
+        class="btn-primary">
+
+            Guardar cambios
+
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

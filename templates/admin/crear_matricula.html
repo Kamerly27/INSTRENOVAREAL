@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Nueva Matrícula | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Nueva Matrícula</h1>
+    <p>Inscribir estudiante en un curso activo</p>
+</div>
+
+<div class="form-card">
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Estudiante</label>
+
+                <select name="estudiante_id" required>
+
+                    <option value="">
+                        Seleccione un estudiante
+                    </option>
+
+                    {% for estudiante in estudiantes %}
+                    <option value="{{ estudiante.id }}">
+                        {{ estudiante.nombre }} {{ estudiante.apellido }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Curso</label>
+
+                <select name="curso_id" required>
+
+                    <option value="">
+                        Seleccione un curso
+                    </option>
+
+                    {% for curso in cursos %}
+                    <option value="{{ curso.id }}">
+                        {{ curso.nombre }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Matricular estudiante
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

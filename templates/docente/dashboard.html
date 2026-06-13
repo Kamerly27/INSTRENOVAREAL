@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Panel Docente | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Panel Docente</h1>
+    <p>Mis cursos asignados por el administrador</p>
+</div>
+
+<div class="cards">
+
+    {% for curso in cursos %}
+
+    <a
+    class="card"
+    href="{{ url_for('docente.detalle_curso', id=curso.id) }}">
+
+        <div class="card-icon">
+            <i class='bx bxs-book-open'></i>
+        </div>
+
+        <div>
+
+            <h3>
+                {{ curso.nombre }}
+            </h3>
+
+            <p>
+                {{ curso.descripcion }}
+            </p>
+
+        </div>
+
+    </a>
+
+    {% else %}
+
+    <div class="table-card">
+
+        <p class="empty-table">
+
+            Aún no tienes cursos asignados.
+
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

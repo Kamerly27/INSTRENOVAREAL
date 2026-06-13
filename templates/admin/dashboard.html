@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Panel Administrativo | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Panel Administrativo</h1>
+    <p>Gestión académica principal del Instituto Renova</p>
+</div>
+
+<div class="cards">
+
+    <a class="card" href="{{ url_for('admin.matriculas') }}">
+        <div class="card-icon">
+            <i class='bx bxs-user-plus'></i>
+        </div>
+        <div>
+            <h3>Matricular</h3>
+            <p>Inscribir estudiantes a cursos</p>
+        </div>
+    </a>
+
+    <a class="card" href="{{ url_for('admin.cursos') }}">
+        <div class="card-icon">
+            <i class='bx bxs-book-add'></i>
+        </div>
+        <div>
+            <h3>Crear curso</h3>
+            <p>Administrar programas académicos</p>
+        </div>
+    </a>
+
+    <a class="card" href="{{ url_for('admin.usuarios') }}">
+        <div class="card-icon">
+            <i class='bx bxs-chalkboard'></i>
+        </div>
+        <div>
+            <h3>Docentes</h3>
+            <p>Crear, editar o eliminar docentes</p>
+        </div>
+    </a>
+
+    <a class="card" href="{{ url_for('admin.usuarios') }}">
+        <div class="card-icon">
+            <i class='bx bxs-graduation'></i>
+        </div>
+        <div>
+            <h3>Estudiantes</h3>
+            <p>Crear, editar o eliminar estudiantes</p>
+        </div>
+    </a>
+
+    <a class="card" href="{{ url_for('admin.certificados') }}">
+        <div class="card-icon">
+            <i class='bx bxs-certification'></i>
+        </div>
+        <div>
+            <h3>Certificados</h3>
+            <p>Generar certificados académicos</p>
+        </div>
+    </a>
+
+    <a class="card" href="{{ url_for('admin.mensajes') }}">
+        <div class="card-icon">
+            <i class='bx bxs-message-detail'></i>
+        </div>
+        <div>
+            <h3>Mensajes</h3>
+            <p>Enviar comunicaciones institucionales</p>
+        </div>
+    </a>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Panel Estudiante | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Hola, {{ current_user.nombre }}</h1>
+    <p>Bienvenido a tu aula virtual. Aquí encontrarás tus cursos, materiales, actividades y evaluaciones.</p>
+</div>
+
+<div class="cards">
+
+    {% for matricula in matriculas %}
+
+    <a
+    class="card"
+    href="{{ url_for('estudiante.modulos', curso_id=matricula.curso.id) }}">
+
+        <div class="card-icon">
+            <i class='bx bxs-graduation'></i>
+        </div>
+
+        <div>
+            <h3>{{ matricula.curso.nombre }}</h3>
+
+            <p>
+                Matriculado desde:
+                {{ matricula.fecha_matricula.strftime('%d/%m/%Y') }}
+            </p>
+
+            <span class="course-badge">
+                Ver contenido del curso
+            </span>
+        </div>
+
+    </a>
+
+    {% else %}
+
+    <div class="table-card">
+        <p class="empty-table">
+            No tienes cursos matriculados todavía.
+        </p>
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

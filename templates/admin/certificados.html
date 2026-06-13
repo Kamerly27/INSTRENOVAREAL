@@ -1,0 +1,119 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Certificados | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1>Certificados</h1>
+
+    <p>
+        Generar y administrar certificados académicos
+    </p>
+
+</div>
+
+
+<div class="actions-bar">
+
+    <a
+    href="{{ url_for('admin.generar_certificado') }}"
+    class="btn-primary">
+
+        <i class='bx bxs-certification'></i>
+
+        Generar certificado
+
+    </a>
+
+</div>
+
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Estudiante</th>
+                <th>Curso</th>
+                <th>Código</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for certificado in certificados %}
+
+            <tr>
+
+                <td>
+
+                    {{ certificado.estudiante.nombre }}
+                    {{ certificado.estudiante.apellido }}
+
+                </td>
+
+                <td>
+
+                    {{ certificado.curso.nombre }}
+
+                </td>
+
+                <td>
+
+                    {{ certificado.codigo_verificacion }}
+
+                </td>
+
+                <td>
+
+                    {{ certificado.fecha_emision.strftime('%d/%m/%Y') }}
+
+                </td>
+
+                <td>
+
+                    <a
+                    href="{{ url_for('admin.descargar_certificado', id=certificado.id) }}"
+                    class="btn-small">
+
+                        Descargar PDF
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+        {% else %}
+
+            <tr>
+
+                <td colspan="5"
+                class="empty-table">
+
+                    No hay certificados generados todavía.
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

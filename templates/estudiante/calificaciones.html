@@ -1,0 +1,82 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Calificaciones | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Mis Calificaciones</h1>
+</div>
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Examen</th>
+                <th>Nota</th>
+                <th>Observación</th>
+                <th>Fecha</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for calificacion in calificaciones %}
+
+            <tr>
+
+                <td>
+
+                    {{ calificacion.examen.titulo }}
+
+                </td>
+
+                <td>
+
+                    {{ calificacion.nota }}
+
+                </td>
+
+                <td>
+
+                    {{ calificacion.observacion }}
+
+                </td>
+
+                <td>
+
+                    {{ calificacion.fecha_calificacion.strftime('%d/%m/%Y') }}
+
+                </td>
+
+            </tr>
+
+        {% else %}
+
+            <tr>
+
+                <td colspan="4" class="empty-table">
+
+                    Aún no tienes calificaciones registradas.
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

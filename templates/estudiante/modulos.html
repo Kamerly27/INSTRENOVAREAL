@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Módulos | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Módulos del Curso</h1>
+    <p>Selecciona una opción para consultar el contenido académico.</p>
+</div>
+
+{% for modulo in modulos %}
+
+<div class="table-card">
+
+    <h2>{{ modulo.orden }}. {{ modulo.titulo }}</h2>
+
+    <p>
+        {{ modulo.descripcion }}
+    </p>
+
+    <div class="modulo-actions">
+
+        <a
+        href="{{ url_for('estudiante.materiales', modulo_id=modulo.id) }}"
+        class="modulo-btn">
+
+            <i class='bx bx-book'></i>
+            Materiales
+
+        </a>
+
+        <a
+        href="{{ url_for('estudiante.actividades', modulo_id=modulo.id) }}"
+        class="modulo-btn">
+
+            <i class='bx bx-edit'></i>
+            Actividades
+
+        </a>
+
+        <a
+        href="{{ url_for('estudiante.examenes', modulo_id=modulo.id) }}"
+        class="modulo-btn">
+
+            <i class='bx bx-task'></i>
+            Exámenes
+
+        </a>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="table-card">
+    <p class="empty-table">
+        Este curso aún no tiene módulos disponibles.
+    </p>
+</div>
+
+{% endfor %}
+
+{% endblock %}

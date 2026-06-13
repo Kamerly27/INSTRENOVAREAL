@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Módulos | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Módulos del Curso</h1>
+    <p>{{ curso.nombre }}</p>
+</div>
+
+<div class="actions-bar">
+    <a href="{{ url_for('docente.crear_modulo', curso_id=curso.id) }}" class="btn-primary">
+        <i class='bx bx-plus'></i>
+        Crear módulo
+    </a>
+</div>
+
+{% for modulo in modulos %}
+
+<div class="table-card">
+
+    <h2>{{ modulo.orden }}. {{ modulo.titulo }}</h2>
+
+    <p>
+        {{ modulo.descripcion }}
+    </p>
+
+    <small>
+        Creado el {{ modulo.fecha_creacion.strftime('%d/%m/%Y') }}
+    </small>
+
+    <div class="modulo-actions">
+
+        <a
+        href="{{ url_for('docente.materiales', modulo_id=modulo.id) }}"
+        class="modulo-btn">
+
+            <i class='bx bx-book'></i>
+            Materiales
+
+        </a>
+
+        <a
+        href="{{ url_for('docente.actividades', modulo_id=modulo.id) }}"
+        class="modulo-btn">
+
+            <i class='bx bx-edit'></i>
+            Actividades
+
+        </a>
+
+        <a
+        href="{{ url_for('docente.examenes', modulo_id=modulo.id) }}"
+        class="modulo-btn">
+
+            <i class='bx bx-task'></i>
+            Exámenes
+
+        </a>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="table-card">
+
+    <p class="empty-table">
+        Este curso aún no tiene módulos creados.
+    </p>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}

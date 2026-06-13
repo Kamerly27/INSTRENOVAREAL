@@ -1,0 +1,123 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Exámenes | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Exámenes del Módulo</h1>
+</div>
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Estado</th>
+                <th>Acción</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for examen in examenes %}
+
+            <tr>
+
+                <td>
+
+                    {{ examen.titulo }}
+
+                </td>
+
+                <td>
+
+                    {{ examen.descripcion }}
+
+                </td>
+
+                <td>
+
+                    {% if examen.fecha_inicio %}
+                        {{ examen.fecha_inicio.strftime('%d/%m/%Y') }}
+                    {% else %}
+                        Sin definir
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if examen.fecha_fin %}
+                        {{ examen.fecha_fin.strftime('%d/%m/%Y') }}
+                    {% else %}
+                        Sin definir
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if examen.activo %}
+                        Activo
+                    {% else %}
+                        Inactivo
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if examen.enlace %}
+
+                        <a
+                        href="{{ examen.enlace }}"
+                        target="_blank"
+                        class="btn-small">
+
+                            Presentar examen
+
+                        </a>
+
+                    {% else %}
+
+                        Sin enlace
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+        {% else %}
+
+            <tr>
+
+                <td colspan="6" class="empty-table">
+
+                    Este módulo no tiene exámenes.
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

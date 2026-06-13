@@ -1,0 +1,90 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Certificados | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Mis Certificados</h1>
+</div>
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Código</th>
+                <th>Fecha de emisión</th>
+                <th>Certificado</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for certificado in certificados %}
+
+            <tr>
+
+                <td>
+
+                    {{ certificado.codigo_verificacion }}
+
+                </td>
+
+                <td>
+
+                    {{ certificado.fecha_emision.strftime('%d/%m/%Y') }}
+
+                </td>
+
+                <td>
+
+                    {% if certificado.pdf_url %}
+
+                        <a
+                        href="{{ certificado.pdf_url }}"
+                        target="_blank"
+                        class="btn-small">
+
+                            Descargar certificado
+
+                        </a>
+
+                    {% else %}
+
+                        Pendiente
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+        {% else %}
+
+            <tr>
+
+                <td colspan="3" class="empty-table">
+
+                    No tienes certificados disponibles.
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Usuarios | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Gestión de Usuarios</h1>
+    <p>Administrar administradores, docentes y estudiantes</p>
+</div>
+
+<div class="actions-bar">
+    <a href="{{ url_for('admin.crear_usuario') }}" class="btn-primary">
+        <i class='bx bxs-user-plus'></i>
+        Crear usuario
+    </a>
+</div>
+
+<div class="table-card">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+                <td>{{ usuario.correo }}</td>
+                <td>{{ usuario.rol }}</td>
+
+                <td>
+                    {% if usuario.activo %}
+                        Activo
+                    {% else %}
+                        Inactivo
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a href="{{ url_for('admin.editar_usuario', id=usuario.id) }}" class="btn-small">
+                        Editar
+                    </a>
+
+                    <a href="{{ url_for('admin.eliminar_usuario', id=usuario.id) }}"
+                       class="btn-small danger"
+                       onclick="return confirm('¿Seguro que deseas eliminar este usuario?');">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5" class="empty-table">
+                    No hay usuarios registrados todavía.
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

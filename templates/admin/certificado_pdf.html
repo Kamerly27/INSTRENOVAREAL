@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        Certificado Académico
+    </title>
+
+    <style>
+
+        body{
+            font-family: Arial, sans-serif;
+            margin:70px;
+            color:#222;
+        }
+
+        .logo{
+            text-align:center;
+            margin-bottom:20px;
+        }
+
+        .logo img{
+            width:140px;
+        }
+
+        .institucion{
+            text-align:center;
+            margin-bottom:50px;
+        }
+
+        .institucion h1{
+            margin:0;
+        }
+
+        .titulo{
+            text-align:center;
+            font-size:35px;
+            margin-top:50px;
+            margin-bottom:50px;
+        }
+
+        .contenido{
+            font-size:20px;
+            line-height:40px;
+            text-align:justify;
+        }
+
+        .nombre{
+            text-align:center;
+            font-size:32px;
+            font-weight:bold;
+            margin-top:40px;
+            margin-bottom:40px;
+        }
+
+        .curso{
+            text-align:center;
+            font-size:28px;
+            font-weight:bold;
+        }
+
+        .firmas{
+            margin-top:150px;
+            display:flex;
+            justify-content:space-between;
+        }
+
+        .firma{
+            width:300px;
+            text-align:center;
+        }
+
+        .codigo{
+            margin-top:80px;
+            text-align:center;
+            font-size:18px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="logo">
+
+    <img src="{{ url_for('static', filename='img/logo.png') }}">
+
+</div>
+
+
+<div class="institucion">
+
+    <h1>
+        INSTITUTO RENOVA
+    </h1>
+
+    <h3>
+        Formación para el Trabajo y el Desarrollo Humano
+    </h3>
+
+</div>
+
+
+<div class="titulo">
+
+    <b>
+        CERTIFICADO ACADÉMICO
+    </b>
+
+</div>
+
+
+<div class="contenido">
+
+    El Instituto Renova certifica que:
+
+</div>
+
+
+<div class="nombre">
+
+    {{ certificado.estudiante.nombre }}
+    {{ certificado.estudiante.apellido }}
+
+</div>
+
+
+<div class="contenido">
+
+    cursó y aprobó satisfactoriamente el programa académico:
+
+</div>
+
+
+<div class="curso">
+
+    {{ certificado.curso.nombre }}
+
+</div>
+
+
+<div class="contenido">
+
+    y cumplió con todos los requisitos exigidos por la institución.
+
+</div>
+
+
+<div class="firmas">
+
+    <div class="firma">
+
+        ______________________
+
+        <br><br>
+
+        Rector
+
+    </div>
+
+
+    <div class="firma">
+
+        ______________________
+
+        <br><br>
+
+        Coordinador Académico
+
+    </div>
+
+</div>
+
+
+<div class="codigo">
+
+    Código de verificación:
+
+    {{ certificado.codigo_verificacion }}
+
+</div>
+
+</body>
+
+</html>

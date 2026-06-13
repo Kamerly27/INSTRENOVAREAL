@@ -1,0 +1,105 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Materiales | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Materiales del Módulo</h1>
+</div>
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Enlace</th>
+                <th>Archivo</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for material in materiales %}
+
+            <tr>
+
+                <td>
+
+                    {{ material.titulo }}
+
+                </td>
+
+                <td>
+
+                    {{ material.descripcion }}
+
+                </td>
+
+                <td>
+
+                    {% if material.enlace %}
+
+                        <a
+                        href="{{ material.enlace }}"
+                        target="_blank"
+                        class="btn-small">
+
+                            Abrir material
+
+                        </a>
+
+                    {% else %}
+
+                        Sin enlace
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if material.archivo %}
+
+                        {{ material.archivo }}
+
+                    {% else %}
+
+                        Sin archivo
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+        {% else %}
+
+            <tr>
+
+                <td colspan="4" class="empty-table">
+
+                    Este módulo no tiene materiales.
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}
