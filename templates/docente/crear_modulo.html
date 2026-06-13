@@ -1,14 +1,14 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-Crear Material | Instituto Renova
+Crear Módulo | Instituto Renova
 {% endblock %}
 
 {% block content %}
 
 <div class="page-header">
-    <h1>Crear Material</h1>
-    <p>{{ modulo.titulo }}</p>
+    <h1>Crear Módulo</h1>
+    <p>{{ curso.nombre }}</p>
 </div>
 
 <div class="form-card">
@@ -18,13 +18,13 @@ Crear Material | Instituto Renova
         <div class="form-grid">
 
             <div class="form-group">
-                <label>Título del material</label>
+                <label>Título del módulo</label>
                 <input type="text" name="titulo" required>
             </div>
 
             <div class="form-group">
-                <label>Enlace o video</label>
-                <input type="url" name="enlace" placeholder="https://...">
+                <label>Orden</label>
+                <input type="number" name="orden" min="1" value="1" required>
             </div>
 
             <div class="form-group full">
@@ -32,15 +32,10 @@ Crear Material | Instituto Renova
                 <textarea name="descripcion" required></textarea>
             </div>
 
-            <div class="form-group full">
-                <label>Archivo PDF / guía / recurso</label>
-                <input type="text" name="archivo" placeholder="Nombre o URL del archivo">
-            </div>
-
         </div>
 
         <button type="submit" class="btn-primary">
-            Crear material
+            Crear módulo
         </button>
 
     </form>
