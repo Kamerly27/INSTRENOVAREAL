@@ -1,12 +1,17 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 class Config:
-    SECRET_KEY = 'renova_secret_key'
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///renova.db'
+    SECRET_KEY = os.getenv('SECRET_KEY', 'renova_secret_key')
+
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # CLOUDINARY
-    CLOUDINARY_CLOUD_NAME = 'TU_CLOUD_NAME'
-    CLOUDINARY_API_KEY = 'TU_API_KEY'
-    CLOUDINARY_API_SECRET = 'TU_API_SECRET'
+    CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME') or os.getenv('CLOUD_NAME')
+    CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY') or os.getenv('API_KEY')
+    CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET') or os.getenv('API_SECRET')
