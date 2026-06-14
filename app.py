@@ -64,6 +64,26 @@ with app.app_context():
         ADD COLUMN IF NOT EXISTS estado VARCHAR(50) DEFAULT 'activa'
     """))
 
+    db.session.execute(db.text("""
+        ALTER TABLE modulos
+        ADD COLUMN IF NOT EXISTS descripcion TEXT
+    """))
+
+    db.session.execute(db.text("""
+        ALTER TABLE modulos
+        ADD COLUMN IF NOT EXISTS orden INTEGER DEFAULT 1
+    """))
+
+    db.session.execute(db.text("""
+        ALTER TABLE modulos
+        ADD COLUMN IF NOT EXISTS fecha_creacion TIMESTAMP
+    """))
+
+    db.session.execute(db.text("""
+        ALTER TABLE modulos
+        ADD COLUMN IF NOT EXISTS curso_id INTEGER
+    """))
+
     db.session.commit()
 
 
