@@ -29,6 +29,15 @@ with app.app_context():
     configurar_cloudinary()
     db.create_all()
 
+    db.session.execute(
+        db.text("""
+            ALTER TABLE cursos
+            ADD COLUMN IF NOT EXISTS fecha_creacion TIMESTAMP
+        """)
+    )
+
+    db.session.commit()
+
 
 @login_manager.user_loader
 def load_user(user_id):
