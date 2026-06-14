@@ -29,12 +29,30 @@ with app.app_context():
     configurar_cloudinary()
     db.create_all()
 
-    db.session.execute(
-        db.text("""
-            ALTER TABLE cursos
-            ADD COLUMN IF NOT EXISTS fecha_creacion TIMESTAMP
-        """)
-    )
+    db.session.execute(db.text("""
+        ALTER TABLE cursos
+        ADD COLUMN IF NOT EXISTS descripcion TEXT
+    """))
+
+    db.session.execute(db.text("""
+        ALTER TABLE cursos
+        ADD COLUMN IF NOT EXISTS imagen VARCHAR(255)
+    """))
+
+    db.session.execute(db.text("""
+        ALTER TABLE cursos
+        ADD COLUMN IF NOT EXISTS activo BOOLEAN DEFAULT TRUE
+    """))
+
+    db.session.execute(db.text("""
+        ALTER TABLE cursos
+        ADD COLUMN IF NOT EXISTS fecha_creacion TIMESTAMP
+    """))
+
+    db.session.execute(db.text("""
+        ALTER TABLE cursos
+        ADD COLUMN IF NOT EXISTS docente_id INTEGER
+    """))
 
     db.session.commit()
 

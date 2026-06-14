@@ -1,12 +1,14 @@
 from database.db import db
-from datetime import datetime
 
 
 class Curso(db.Model):
 
     __tablename__ = 'cursos'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     nombre = db.Column(
         db.String(150),
@@ -25,11 +27,6 @@ class Curso(db.Model):
     activo = db.Column(
         db.Boolean,
         default=True
-    )
-
-    fecha_creacion = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
     )
 
     docente_id = db.Column(
