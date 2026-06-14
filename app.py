@@ -54,6 +54,16 @@ with app.app_context():
         ADD COLUMN IF NOT EXISTS docente_id INTEGER
     """))
 
+    db.session.execute(db.text("""
+        ALTER TABLE matriculas
+        ADD COLUMN IF NOT EXISTS fecha_matricula TIMESTAMP
+    """))
+
+    db.session.execute(db.text("""
+        ALTER TABLE matriculas
+        ADD COLUMN IF NOT EXISTS estado VARCHAR(50) DEFAULT 'activa'
+    """))
+
     db.session.commit()
 
 
