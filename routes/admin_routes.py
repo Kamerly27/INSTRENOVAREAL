@@ -87,7 +87,7 @@ def eliminar_usuario(id):
 
 @admin.route('/cursos')
 def cursos():
-    cursos = Curso.query.order_by(Curso.fecha_creacion.desc()).all()
+    cursos = Curso.query.order_by(Curso.id.desc()).all()
     return render_template('admin/cursos.html', cursos=cursos)
 
 
