@@ -1,13 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-Crear Examen | Instituto Renova
+Crear actividad / evaluación | Instituto Renova
 {% endblock %}
 
 {% block content %}
 
 <div class="page-header">
-    <h1>Crear Examen</h1>
+    <h1>Crear actividad / evaluación</h1>
     <p>{{ modulo.titulo }}</p>
 </div>
 
@@ -18,10 +18,11 @@ Crear Examen | Instituto Renova
         <div class="form-grid">
 
             <div class="form-group">
-                <label>Título del examen</label>
+                <label>Título de la actividad / evaluación</label>
                 <input
                 type="text"
                 name="titulo"
+                placeholder="Ejemplo: Actividad - Plan personal de preparación"
                 required>
             </div>
 
@@ -47,11 +48,11 @@ Crear Examen | Instituto Renova
                 required>
 
                     <option value="1">
-                        Activo
+                        Activa
                     </option>
 
                     <option value="0">
-                        Inactivo
+                        Inactiva
                     </option>
 
                 </select>
@@ -63,17 +64,18 @@ Crear Examen | Instituto Renova
 
                 <textarea
                 name="descripcion"
+                placeholder="Escriba una descripción breve de la actividad o evaluación."
                 required></textarea>
 
             </div>
 
             <div class="form-group full">
-                <label>Enlace de Google Forms</label>
+                <label>Enlace opcional</label>
 
                 <input
                 type="text"
                 name="enlace"
-                placeholder="https://docs.google.com/forms/...">
+                placeholder="Puede pegar aquí el enlace del formulario, actividad o recurso">
 
             </div>
 
@@ -83,7 +85,7 @@ Crear Examen | Instituto Renova
         type="submit"
         class="btn-primary">
 
-            Crear examen
+            Crear actividad / evaluación
 
         </button>
 

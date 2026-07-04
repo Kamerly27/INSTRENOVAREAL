@@ -1,13 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-Exámenes | Instituto Renova
+Actividades / Evaluaciones | Instituto Renova
 {% endblock %}
 
 {% block content %}
 
 <div class="page-header">
-    <h1>Exámenes del Módulo</h1>
+    <h1>Actividades / Evaluaciones del Módulo</h1>
     <p>{{ modulo.titulo }}</p>
 </div>
 
@@ -17,7 +17,7 @@ Exámenes | Instituto Renova
     class="btn-primary">
 
         <i class='bx bx-plus'></i>
-        Crear examen
+        Crear actividad / evaluación
 
     </a>
 </div>
@@ -94,7 +94,7 @@ Exámenes | Instituto Renova
                         target="_blank"
                         class="btn-small">
 
-                            Abrir examen
+                            Abrir actividad
 
                         </a>
 
@@ -104,7 +104,7 @@ Exámenes | Instituto Renova
                     href="{{ url_for('docente.calificaciones', examen_id=examen.id) }}"
                     class="btn-small">
 
-                        Calificaciones
+                        Ver / registrar notas
 
                     </a>
 
@@ -134,7 +134,7 @@ Exámenes | Instituto Renova
 
                 <td colspan="6" class="empty-table">
 
-                    Este módulo aún no tiene exámenes.
+                    Este módulo aún no tiene actividades / evaluaciones.
 
                 </td>
 

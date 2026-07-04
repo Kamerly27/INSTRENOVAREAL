@@ -1,20 +1,20 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-Calificaciones | Instituto Renova
+Planilla de notas | Instituto Renova
 {% endblock %}
 
 {% block content %}
 
 <div class="page-header">
-    <h1>Calificaciones</h1>
+    <h1>Planilla de notas</h1>
     <p>{{ examen.titulo }}</p>
 </div>
 
 <div class="actions-bar">
     <a href="{{ url_for('docente.crear_calificacion', examen_id=examen.id) }}" class="btn-primary">
         <i class='bx bx-plus'></i>
-        Registrar calificación
+        Registrar nota
     </a>
 </div>
 
@@ -42,7 +42,13 @@ Calificaciones | Instituto Renova
 
                 <td>{{ calificacion.nota }}</td>
 
-                <td>{{ calificacion.observacion }}</td>
+                <td>
+                    {% if calificacion.observacion %}
+                        {{ calificacion.observacion }}
+                    {% else %}
+                        Sin observación
+                    {% endif %}
+                </td>
 
                 <td>{{ calificacion.fecha_calificacion.strftime('%d/%m/%Y') }}</td>
 
@@ -59,7 +65,7 @@ Calificaciones | Instituto Renova
         {% else %}
             <tr>
                 <td colspan="5" class="empty-table">
-                    Este examen aún no tiene calificaciones registradas.
+                    Esta actividad / evaluación aún no tiene notas registradas.
                 </td>
             </tr>
         {% endfor %}

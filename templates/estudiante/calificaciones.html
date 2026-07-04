@@ -1,13 +1,14 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-Calificaciones | Instituto Renova
+Mis notas | Instituto Renova
 {% endblock %}
 
 {% block content %}
 
 <div class="page-header">
-    <h1>Mis Calificaciones</h1>
+    <h1>Mis notas</h1>
+    <p>Consulta aquí tus calificaciones de actividades, evaluaciones y exámenes.</p>
 </div>
 
 <div class="table-card">
@@ -18,7 +19,7 @@ Calificaciones | Instituto Renova
 
             <tr>
 
-                <th>Examen</th>
+                <th>Actividad / Evaluación</th>
                 <th>Nota</th>
                 <th>Observación</th>
                 <th>Fecha</th>
@@ -47,7 +48,11 @@ Calificaciones | Instituto Renova
 
                 <td>
 
-                    {{ calificacion.observacion }}
+                    {% if calificacion.observacion %}
+                        {{ calificacion.observacion }}
+                    {% else %}
+                        Sin observación
+                    {% endif %}
 
                 </td>
 
@@ -65,7 +70,7 @@ Calificaciones | Instituto Renova
 
                 <td colspan="4" class="empty-table">
 
-                    Aún no tienes calificaciones registradas.
+                    Aún no tienes notas registradas.
 
                 </td>
 

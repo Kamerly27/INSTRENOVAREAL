@@ -1,13 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-Editar Examen | Instituto Renova
+Editar actividad / evaluación | Instituto Renova
 {% endblock %}
 
 {% block content %}
 
 <div class="page-header">
-    <h1>Editar Examen</h1>
+    <h1>Editar actividad / evaluación</h1>
     <p>{{ modulo.titulo }}</p>
 </div>
 
@@ -18,7 +18,7 @@ Editar Examen | Instituto Renova
         <div class="form-grid">
 
             <div class="form-group">
-                <label>Título del examen</label>
+                <label>Título de la actividad / evaluación</label>
                 <input
                 type="text"
                 name="titulo"
@@ -45,20 +45,14 @@ Editar Examen | Instituto Renova
             <div class="form-group">
                 <label>Estado</label>
 
-                <select name="activo">
-
-                    <option
-                    value="1"
-                    {% if examen.activo %}selected{% endif %}>
-                        Activo
+                <select name="activo" required>
+                    <option value="1" {% if examen.activo %}selected{% endif %}>
+                        Activa
                     </option>
 
-                    <option
-                    value="0"
-                    {% if not examen.activo %}selected{% endif %}>
-                        Inactivo
+                    <option value="0" {% if not examen.activo %}selected{% endif %}>
+                        Inactiva
                     </option>
-
                 </select>
             </div>
 
@@ -71,23 +65,19 @@ Editar Examen | Instituto Renova
             </div>
 
             <div class="form-group full">
-                <label>Enlace de Google Forms</label>
+                <label>Enlace opcional</label>
 
                 <input
                 type="text"
                 name="enlace"
                 value="{{ examen.enlace or '' }}"
-                placeholder="https://docs.google.com/forms/...">
+                placeholder="Puede pegar aquí el enlace del formulario, actividad o recurso">
             </div>
 
         </div>
 
-        <button
-        type="submit"
-        class="btn-primary">
-
+        <button type="submit" class="btn-primary">
             Guardar cambios
-
         </button>
 
     </form>
