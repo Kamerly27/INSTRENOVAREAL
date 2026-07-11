@@ -1,4 +1,4 @@
-import os
+﻿import os
 import uuid
 from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, request, redirect, url_for
@@ -132,7 +132,7 @@ def crear_material(modulo_id):
         archivo_subido = request.files.get('archivo_file')
 
         if archivo_subido and archivo_subido.filename:
-            carpeta = os.path.join('static', 'uploads', 'materiales')
+            carpeta = os.path.join('static', 'uploads', 'materiales_imagenes')
             os.makedirs(carpeta, exist_ok=True)
 
             nombre_seguro = secure_filename(archivo_subido.filename)
@@ -142,7 +142,7 @@ def crear_material(modulo_id):
             ruta_archivo = os.path.join(carpeta, nombre_final)
             archivo_subido.save(ruta_archivo)
 
-            archivo_guardado = f"uploads/materiales/{nombre_final}"
+            archivo_guardado = f"uploads/materiales_imagenes/{nombre_final}"
 
         nuevo_material = Material(
             titulo=request.form.get('titulo'),
