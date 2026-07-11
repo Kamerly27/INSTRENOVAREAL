@@ -6,100 +6,217 @@ Materiales | Instituto Renova
 
 {% block content %}
 
-<div class="page-header">
-    <h1>Materiales del Módulo</h1>
+<style>
+    .materiales-hero {
+        background: linear-gradient(135deg, #0b3d2e, #16805f);
+        color: white;
+        padding: 30px;
+        border-radius: 24px;
+        margin-bottom: 28px;
+        box-shadow: 0 14px 32px rgba(0,0,0,0.18);
+    }
+
+    .materiales-hero h1 {
+        margin: 0;
+        font-size: 34px;
+    }
+
+    .materiales-hero p {
+        margin: 10px 0 0;
+        font-size: 16px;
+        opacity: 0.95;
+    }
+
+    .materiales-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 22px;
+    }
+
+    .material-card-renova {
+        background: white;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.10);
+        border: 1px solid #e5e7eb;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .material-card-renova:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 36px rgba(0,0,0,0.16);
+    }
+
+    .material-imagen {
+        width: 100%;
+        height: 230px;
+        background: #ecfdf5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .material-imagen img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .material-icono {
+        font-size: 52px;
+        color: #0b3d2e;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .material-contenido {
+        padding: 22px;
+    }
+
+    .material-contenido h2 {
+        margin: 0 0 12px;
+        color: #0b3d2e;
+        font-size: 22px;
+    }
+
+    .material-contenido p {
+        color: #374151;
+        line-height: 1.6;
+        margin-bottom: 18px;
+        white-space: pre-line;
+    }
+
+    .material-botones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .btn-material {
+        display: inline-block;
+        background: #0b3d2e;
+        color: white;
+        padding: 11px 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .btn-material.secundario {
+        background: #475569;
+    }
+
+    .sin-materiales {
+        background: white;
+        border-radius: 20px;
+        padding: 35px;
+        text-align: center;
+        box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+        color: #475569;
+    }
+
+    .sin-materiales strong {
+        color: #0b3d2e;
+        font-size: 20px;
+    }
+</style>
+
+<div class="materiales-hero">
+    <h1>Materiales del módulo</h1>
+    <p>Encuentre aquí explicaciones, imágenes, esquemas, guías, videos y recursos compartidos por el docente.</p>
 </div>
 
-<div class="table-card">
+{% if materiales %}
 
-    <table>
+<div class="materiales-grid">
 
-        <thead>
+    {% for material in materiales %}
 
-            <tr>
+        {% set archivo = material.archivo or '' %}
+        {% set archivo_lower = archivo|lower %}
 
-                <th>Título</th>
-                <th>Descripción</th>
-                <th>Enlace</th>
-                <th>Archivo</th>
+        {% set es_imagen =
+            archivo_lower.endswith('.jpg') or
+            archivo_lower.endswith('.jpeg') or
+            archivo_lower.endswith('.png') or
+            archivo_lower.endswith('.webp') or
+            archivo_lower.endswith('.gif')
+        %}
 
-            </tr>
+        {% set es_pdf = archivo_lower.endswith('.pdf') %}
 
-        </thead>
+        {% if archivo_lower.startswith('http') %}
+            {% set archivo_url = archivo %}
+        {% elif archivo %}
+            {% set archivo_url = url_for('static', filename=archivo) %}
+        {% else %}
+            {% set archivo_url = '' %}
+        {% endif %}
 
-        <tbody>
+        <div class="material-card-renova">
 
-        {% for material in materiales %}
+            <div class="material-imagen">
 
-            <tr>
+                {% if archivo and es_imagen %}
 
-                <td>
+                    <img src="{{ archivo_url }}" alt="{{ material.titulo }}">
 
-                    {{ material.titulo }}
+                {% elif archivo and es_pdf %}
 
-                </td>
+                    <div class="material-icono">
+                        PDF
+                    </div>
 
-                <td>
+                {% else %}
 
-                    {{ material.descripcion }}
+                    <div class="material-icono">
+                        RENOVA
+                    </div>
 
-                </td>
+                {% endif %}
 
-                <td>
+            </div>
+
+            <div class="material-contenido">
+
+                <h2>{{ material.titulo }}</h2>
+
+                <p>{{ material.descripcion }}</p>
+
+                <div class="material-botones">
 
                     {% if material.enlace %}
-
-                        <a
-                        href="{{ material.enlace }}"
-                        target="_blank"
-                        class="btn-small">
-
-                            Abrir material
-
+                        <a href="{{ material.enlace }}" target="_blank" class="btn-material">
+                            Abrir enlace o video
                         </a>
-
-                    {% else %}
-
-                        Sin enlace
-
                     {% endif %}
 
-                </td>
-
-                <td>
-
-                    {% if material.archivo %}
-
-                        {{ material.archivo }}
-
-                    {% else %}
-
-                        Sin archivo
-
+                    {% if archivo %}
+                        <a href="{{ archivo_url }}" target="_blank" class="btn-material secundario">
+                            Abrir archivo
+                        </a>
                     {% endif %}
 
-                </td>
+                </div>
 
-            </tr>
+            </div>
 
-        {% else %}
+        </div>
 
-            <tr>
-
-                <td colspan="4" class="empty-table">
-
-                    Este módulo no tiene materiales.
-
-                </td>
-
-            </tr>
-
-        {% endfor %}
-
-        </tbody>
-
-    </table>
+    {% endfor %}
 
 </div>
+
+{% else %}
+
+<div class="sin-materiales">
+    <strong>No hay materiales publicados todavía.</strong>
+    <p>Cuando el docente cargue imágenes, esquemas, videos o guías, aparecerán aquí.</p>
+</div>
+
+{% endif %}
 
 {% endblock %}

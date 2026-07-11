@@ -1,3 +1,6 @@
+import os
+import uuid
+from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 from datetime import datetime
@@ -125,11 +128,27 @@ def crear_material(modulo_id):
 
     if request.method == 'POST':
 
+        archivo_guardado = request.form.get('archivo', '').strip()
+        archivo_subido = request.files.get('archivo_file')
+
+        if archivo_subido and archivo_subido.filename:
+            carpeta = os.path.join('static', 'uploads', 'materiales')
+            os.makedirs(carpeta, exist_ok=True)
+
+            nombre_seguro = secure_filename(archivo_subido.filename)
+            extension = os.path.splitext(nombre_seguro)[1].lower()
+            nombre_final = f"{uuid.uuid4().hex}{extension}"
+
+            ruta_archivo = os.path.join(carpeta, nombre_final)
+            archivo_subido.save(ruta_archivo)
+
+            archivo_guardado = f"uploads/materiales/{nombre_final}"
+
         nuevo_material = Material(
             titulo=request.form.get('titulo'),
             descripcion=request.form.get('descripcion'),
             enlace=request.form.get('enlace'),
-            archivo=request.form.get('archivo'),
+            archivo=archivo_guardado,
             modulo_id=modulo_id
         )
 
