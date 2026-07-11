@@ -1,3 +1,5 @@
+import cloudinary
+import cloudinary.uploader
 ﻿import os
 import uuid
 from werkzeug.utils import secure_filename
@@ -132,17 +134,21 @@ def crear_material(modulo_id):
         archivo_subido = request.files.get('archivo_file')
 
         if archivo_subido and archivo_subido.filename:
-            carpeta = os.path.join('static', 'uploads', 'materiales_imagenes')
-            os.makedirs(carpeta, exist_ok=True)
 
-            nombre_seguro = secure_filename(archivo_subido.filename)
-            extension = os.path.splitext(nombre_seguro)[1].lower()
-            nombre_final = f"{uuid.uuid4().hex}{extension}"
+            cloudinary.config(
+                cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME") or os.environ.get("CLOUD_NAME"),
+                api_key=os.environ.get("CLOUDINARY_API_KEY") or os.environ.get("API_KEY"),
+                api_secret=os.environ.get("CLOUDINARY_API_SECRET") or os.environ.get("API_SECRET"),
+                secure=True
+            )
 
-            ruta_archivo = os.path.join(carpeta, nombre_final)
-            archivo_subido.save(ruta_archivo)
+            resultado = cloudinary.uploader.upload(
+                archivo_subido,
+                folder="renova/materiales",
+                resource_type="auto"
+            )
 
-            archivo_guardado = f"uploads/materiales_imagenes/{nombre_final}"
+            archivo_guardado = resultado.get("secure_url")
 
         nuevo_material = Material(
             titulo=request.form.get('titulo'),
@@ -161,7 +167,6 @@ def crear_material(modulo_id):
         'docente/crear_material.html',
         modulo=modulo
     )
-
 
 @docente.route('/material/<int:id>/editar', methods=['GET', 'POST'])
 @login_required
