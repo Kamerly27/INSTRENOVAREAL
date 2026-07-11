@@ -1,6 +1,6 @@
 import cloudinary
 import cloudinary.uploader
-﻿import os
+import os
 import uuid
 from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, request, redirect, url_for
