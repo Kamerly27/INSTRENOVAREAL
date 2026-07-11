@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 
 {% block title %}
 Crear Material | Instituto Renova
@@ -6,41 +6,157 @@ Crear Material | Instituto Renova
 
 {% block content %}
 
-<div class="page-header">
-    <h1>Crear Material</h1>
+<style>
+    .material-hero {
+        background: linear-gradient(135deg, #0b3d2e, #16805f);
+        color: white;
+        padding: 30px;
+        border-radius: 24px;
+        margin-bottom: 28px;
+        box-shadow: 0 14px 32px rgba(0,0,0,0.18);
+    }
+
+    .material-hero h1 {
+        margin: 0;
+        font-size: 34px;
+    }
+
+    .material-card {
+        background: white;
+        padding: 30px;
+        border-radius: 24px;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.10);
+    }
+
+    .grid-material {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .campo {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .campo.full {
+        grid-column: 1 / 3;
+    }
+
+    .campo label {
+        font-weight: bold;
+        color: #0b3d2e;
+        font-size: 16px;
+    }
+
+    .campo input,
+    .campo textarea {
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid #cbd5e1;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    .campo textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    .zona-imagen {
+        border: 2px dashed #0b3d2e;
+        background: #ecfdf5;
+        padding: 28px;
+        border-radius: 20px;
+        text-align: center;
+    }
+
+    .zona-imagen strong {
+        display: block;
+        color: #0b3d2e;
+        font-size: 22px;
+        margin-bottom: 8px;
+    }
+
+    .zona-imagen span {
+        color: #475569;
+    }
+
+    .btn-renova {
+        margin-top: 24px;
+        background: #0b3d2e;
+        color: white;
+        border: none;
+        padding: 15px 28px;
+        border-radius: 14px;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .btn-renova:hover {
+        background: #145c45;
+    }
+
+    @media (max-width: 800px) {
+        .grid-material {
+            grid-template-columns: 1fr;
+        }
+
+        .campo.full {
+            grid-column: 1;
+        }
+    }
+</style>
+
+<div class="material-hero">
+    <h1>Crear material visual</h1>
     <p>{{ modulo.titulo }}</p>
 </div>
 
-<div class="form-card">
+<div class="material-card">
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
 
-        <div class="form-grid">
+        <div class="grid-material">
 
-            <div class="form-group">
+            <div class="campo">
                 <label>Título del material</label>
-                <input type="text" name="titulo" required>
+                <input type="text" name="titulo" placeholder="Ej: Esquema explicado del tema" required>
             </div>
 
-            <div class="form-group">
+            <div class="campo">
                 <label>Enlace o video</label>
                 <input type="url" name="enlace" placeholder="https://...">
             </div>
 
-            <div class="form-group full">
-                <label>Descripción</label>
-                <textarea name="descripcion" required></textarea>
+            <div class="campo full">
+                <label>Explicación para el estudiante</label>
+                <textarea name="descripcion" placeholder="Escriba aquí la explicación, instrucciones o resumen..." required></textarea>
             </div>
 
-            <div class="form-group full">
-                <label>Archivo PDF / guía / recurso</label>
-                <input type="text" name="archivo" placeholder="Nombre o URL del archivo">
+            <div class="campo full">
+                <label>Imagen, esquema, guía o PDF</label>
+
+                <div class="zona-imagen">
+                    <strong>Subir imagen o esquema</strong>
+                    <span>Puede cargar JPG, PNG, WEBP o PDF.</span>
+                    <br><br>
+                    <input type="file" name="archivo_file" accept=".jpg,.jpeg,.png,.webp,.pdf">
+                </div>
+            </div>
+
+            <div class="campo full">
+                <label>Archivo externo o URL opcional</label>
+                <input type="text" name="archivo" placeholder="Opcional: pegue aquí una URL externa">
             </div>
 
         </div>
 
-        <button type="submit" class="btn-primary">
-            Crear material
+        <button type="submit" class="btn-renova">
+            Guardar material visual
         </button>
 
     </form>
