@@ -6,6 +6,8 @@ from models.usuario import Usuario
 from models.matricula import Matricula
 from models.modulo import Modulo
 from models.material import Material
+from models.foro import Foro
+from models.comentario_foro import ComentarioForo
 from models.actividad import Actividad
 from models.examen import Examen
 from models.calificacion import Calificacion
@@ -168,3 +170,62 @@ def certificados():
         'estudiante/certificados.html',
         certificados=certificados
     )
+
+# BLOG ACADEMICO RENOVA
+
+@estudiante.route('/modulo/<int:modulo_id>/blog')
+@login_required
+def blog_modulo(modulo_id):
+
+    modulo = Modulo.query.get_or_404(modulo_id)
+
+    publicaciones = Foro.query.filter_by(
+        modulo_id=modulo_id
+    ).order_by(
+        Foro.fecha_creacion.desc()
+    ).all()
+
+    ids_publicaciones = [p.id for p in publicaciones]
+
+    comentarios = []
+
+    if ids_publicaciones:
+        comentarios = ComentarioForo.query.filter(
+            ComentarioForo.foro_id.in_(ids_publicaciones)
+        ).order_by(
+            ComentarioForo.fecha_comentario.asc()
+        ).all()
+
+    comentarios_por_foro = {}
+
+    for comentario in comentarios:
+        comentarios_por_foro.setdefault(comentario.foro_id, []).append(comentario)
+
+    return render_template(
+        'estudiante/blog.html',
+        modulo=modulo,
+        publicaciones=publicaciones,
+        comentarios_por_foro=comentarios_por_foro
+    )
+
+
+@estudiante.route('/blog/<int:foro_id>/comentar', methods=['POST'])
+@login_required
+def comentar_blog(foro_id):
+
+    foro = Foro.query.get_or_404(foro_id)
+
+    texto = request.form.get('comentario', '').strip()
+
+    if texto:
+
+        nuevo_comentario = ComentarioForo(
+            comentario=texto,
+            foro_id=foro_id,
+            usuario_id=current_user.id
+        )
+
+        db.session.add(nuevo_comentario)
+        db.session.commit()
+
+    return redirect(url_for('estudiante.blog_modulo', modulo_id=foro.modulo_id))

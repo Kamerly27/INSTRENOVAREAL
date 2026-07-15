@@ -13,6 +13,8 @@ from models.curso import Curso
 from models.matricula import Matricula
 from models.modulo import Modulo
 from models.material import Material
+from models.foro import Foro
+from models.comentario_foro import ComentarioForo
 from models.actividad import Actividad
 from models.examen import Examen
 from models.calificacion import Calificacion
@@ -553,3 +555,64 @@ def enviar_mensaje():
         'docente/enviar_mensaje.html',
         usuarios=usuarios
     )
+
+
+# BLOG ACADEMICO RENOVA
+
+@docente.route('/modulo/<int:modulo_id>/blog')
+@login_required
+def blog_modulo(modulo_id):
+
+    modulo = Modulo.query.get_or_404(modulo_id)
+
+    publicaciones = Foro.query.filter_by(
+        modulo_id=modulo_id
+    ).order_by(
+        Foro.fecha_creacion.desc()
+    ).all()
+
+    return render_template(
+        'docente/blog.html',
+        modulo=modulo,
+        publicaciones=publicaciones
+    )
+
+
+@docente.route('/modulo/<int:modulo_id>/blog/crear', methods=['GET', 'POST'])
+@login_required
+def crear_blog(modulo_id):
+
+    modulo = Modulo.query.get_or_404(modulo_id)
+
+    if request.method == 'POST':
+
+        nueva_publicacion = Foro(
+            titulo=request.form.get('titulo'),
+            descripcion=request.form.get('descripcion'),
+            modulo_id=modulo_id
+        )
+
+        db.session.add(nueva_publicacion)
+        db.session.commit()
+
+        return redirect(url_for('docente.blog_modulo', modulo_id=modulo_id))
+
+    return render_template(
+        'docente/crear_blog.html',
+        modulo=modulo
+    )
+
+
+@docente.route('/blog/<int:id>/eliminar')
+@login_required
+def eliminar_blog(id):
+
+    publicacion = Foro.query.get_or_404(id)
+    modulo_id = publicacion.modulo_id
+
+    ComentarioForo.query.filter_by(foro_id=id).delete()
+
+    db.session.delete(publicacion)
+    db.session.commit()
+
+    return redirect(url_for('docente.blog_modulo', modulo_id=modulo_id))
