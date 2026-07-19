@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 
 {% block title %}
 Materiales | Instituto Renova
@@ -7,204 +7,265 @@ Materiales | Instituto Renova
 {% block content %}
 
 <style>
-    .materiales-hero {
-        background: linear-gradient(135deg, #0b3d2e, #16805f);
+    .materiales-hero-renova {
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(circle at top right, #22c55e 0%, #0b3d2e 38%, #071426 100%);
         color: white;
-        padding: 30px;
-        border-radius: 24px;
-        margin-bottom: 28px;
-        box-shadow: 0 14px 32px rgba(0,0,0,0.18);
+        border-radius: 28px;
+        padding: 42px;
+        margin-bottom: 30px;
+        box-shadow: 0 18px 45px rgba(0,0,0,0.22);
     }
 
-    .materiales-hero h1 {
+    .materiales-hero-renova::before {
+        content: "RENOVA";
+        position: absolute;
+        right: 35px;
+        top: 18px;
+        font-size: 96px;
+        font-weight: 900;
+        color: rgba(255,255,255,0.07);
+        letter-spacing: 5px;
+    }
+
+    .materiales-hero-renova h1 {
+        position: relative;
+        z-index: 2;
         margin: 0;
-        font-size: 34px;
+        font-size: 42px;
+        font-weight: 900;
     }
 
-    .materiales-hero p {
-        margin: 10px 0 0;
-        font-size: 16px;
-        opacity: 0.95;
+    .materiales-hero-renova p {
+        position: relative;
+        z-index: 2;
+        margin-top: 12px;
+        max-width: 780px;
+        font-size: 18px;
+        line-height: 1.6;
+        color: #e5e7eb;
     }
 
-    .materiales-grid {
+    .materiales-grid-renova {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 22px;
+        grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+        gap: 26px;
     }
 
     .material-card-renova {
         background: white;
-        border-radius: 22px;
+        border-radius: 28px;
         overflow: hidden;
-        box-shadow: 0 10px 28px rgba(0,0,0,0.10);
+        box-shadow: 0 14px 36px rgba(0,0,0,0.12);
         border: 1px solid #e5e7eb;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .material-card-renova:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 16px 36px rgba(0,0,0,0.16);
+        transform: translateY(-5px);
+        box-shadow: 0 20px 46px rgba(0,0,0,0.17);
     }
 
-    .material-imagen {
-        width: 100%;
+    .video-cover-renova {
+        position: relative;
+        display: block;
         height: 230px;
-        background: #ecfdf5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        background: linear-gradient(135deg, #0b3d2e, #22c55e);
         overflow: hidden;
+        text-decoration: none;
     }
 
-    .material-imagen img {
+    .video-cover-renova img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        display: block;
     }
 
-    .material-icono {
-        font-size: 52px;
+    .video-cover-renova::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(7,20,38,0.10), rgba(7,20,38,0.55));
+    }
+
+    .play-renova {
+        position: absolute;
+        z-index: 3;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 78px;
+        height: 78px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.92);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.30);
+    }
+
+    .play-renova span {
+        width: 0;
+        height: 0;
+        border-top: 17px solid transparent;
+        border-bottom: 17px solid transparent;
+        border-left: 25px solid #0b3d2e;
+        margin-left: 6px;
+    }
+
+    .renova-fondo-video {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.9);
+        font-size: 46px;
+        font-weight: 900;
+        letter-spacing: 3px;
+    }
+
+    .material-content-renova {
+        padding: 26px;
+    }
+
+    .etiqueta-renova {
+        display: inline-block;
+        background: #ecfdf5;
         color: #0b3d2e;
-        font-weight: bold;
-        text-align: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 900;
+        margin-bottom: 14px;
     }
 
-    .material-contenido {
-        padding: 22px;
-    }
-
-    .material-contenido h2 {
+    .material-content-renova h2 {
+        color: #0b3d2e;
         margin: 0 0 12px;
-        color: #0b3d2e;
-        font-size: 22px;
+        font-size: 25px;
+        line-height: 1.25;
     }
 
-    .material-contenido p {
-        color: #374151;
-        line-height: 1.6;
-        margin-bottom: 18px;
+    .material-content-renova p {
+        color: #475569;
+        line-height: 1.7;
+        font-size: 16px;
+        margin-bottom: 22px;
         white-space: pre-line;
     }
 
-    .material-botones {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 16px;
-    }
-
-    .btn-material {
+    .btn-video-renova {
         display: inline-block;
         background: #0b3d2e;
         color: white;
-        padding: 11px 16px;
-        border-radius: 10px;
+        padding: 13px 20px;
+        border-radius: 15px;
         text-decoration: none;
-        font-weight: bold;
-        font-size: 14px;
+        font-weight: 900;
     }
 
-    .btn-material.secundario {
-        background: #475569;
+    .btn-video-renova:hover {
+        background: #16805f;
     }
 
-    .sin-materiales {
+    .sin-materiales-renova {
         background: white;
-        border-radius: 20px;
+        border-radius: 24px;
         padding: 35px;
         text-align: center;
-        box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+        box-shadow: 0 10px 28px rgba(0,0,0,0.08);
         color: #475569;
     }
 
-    .sin-materiales strong {
+    .sin-materiales-renova strong {
         color: #0b3d2e;
-        font-size: 20px;
+        font-size: 22px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    @media (max-width: 800px) {
+        .materiales-hero-renova {
+            padding: 28px;
+        }
+
+        .materiales-hero-renova h1 {
+            font-size: 34px;
+        }
+
+        .materiales-hero-renova::before {
+            font-size: 58px;
+            right: 18px;
+            top: 20px;
+        }
     }
 </style>
 
-<div class="materiales-hero">
+<div class="materiales-hero-renova">
     <h1>Materiales del módulo</h1>
-    <p>Encuentre aquí explicaciones, imágenes, esquemas, guías, videos y recursos compartidos por el docente.</p>
+    <p>
+        Acceda a videos, recursos de apoyo, explicaciones y contenidos compartidos por el docente.
+    </p>
 </div>
 
 {% if materiales %}
 
-<div class="materiales-grid">
+<div class="materiales-grid-renova">
 
     {% for material in materiales %}
 
-        {% set archivo = material.archivo or '' %}
-        {% set archivo_lower = archivo|lower %}
+    <div class="material-card-renova">
 
-        {% set es_imagen =
-            archivo_lower.endswith('.jpg') or
-            archivo_lower.endswith('.jpeg') or
-            archivo_lower.endswith('.png') or
-            archivo_lower.endswith('.webp') or
-            archivo_lower.endswith('.gif')
-        %}
+        {% if material.enlace %}
 
-        {% set es_pdf = archivo_lower.endswith('.pdf') %}
+        <a
+        href="{{ material.enlace }}"
+        target="_blank"
+        class="video-cover-renova"
+        data-video="{{ material.enlace }}">
 
-        {% if archivo_lower.startswith('http') %}
-            {% set archivo_url = archivo %}
-        {% elif archivo %}
-            {% set archivo_url = url_for('static', filename=archivo) %}
+            <div class="renova-fondo-video">
+                RENOVA
+            </div>
+
+            <div class="play-renova">
+                <span></span>
+            </div>
+
+        </a>
+
         {% else %}
-            {% set archivo_url = '' %}
+
+        <div class="video-cover-renova">
+            <div class="renova-fondo-video">
+                RENOVA
+            </div>
+        </div>
+
         {% endif %}
 
-        <div class="material-card-renova">
+        <div class="material-content-renova">
 
-            <div class="material-imagen">
+            <span class="etiqueta-renova">
+                Recurso de estudio
+            </span>
 
-                {% if archivo and es_imagen %}
+            <h2>{{ material.titulo }}</h2>
 
-                    <img src="{{ archivo_url }}" alt="{{ material.titulo }}">
+            <p>{{ material.descripcion }}</p>
 
-                {% elif archivo and es_pdf %}
-
-                    <div class="material-icono">
-                        PDF
-                    </div>
-
-                {% else %}
-
-                    <div class="material-icono">
-                        RENOVA
-                    </div>
-
-                {% endif %}
-
-            </div>
-
-            <div class="material-contenido">
-
-                <h2>{{ material.titulo }}</h2>
-
-                <p>{{ material.descripcion }}</p>
-
-                <div class="material-botones">
-
-                    {% if material.enlace %}
-                        <a href="{{ material.enlace }}" target="_blank" class="btn-material">
-                            Abrir enlace o video
-                        </a>
-                    {% endif %}
-
-                    {% if archivo %}
-                        <a href="{{ archivo_url }}" target="_blank" class="btn-material secundario">
-                            Abrir archivo
-                        </a>
-                    {% endif %}
-
-                </div>
-
-            </div>
+            {% if material.enlace %}
+                <a href="{{ material.enlace }}" target="_blank" class="btn-video-renova">
+                    Ver video o recurso
+                </a>
+            {% endif %}
 
         </div>
+
+    </div>
 
     {% endfor %}
 
@@ -212,11 +273,48 @@ Materiales | Instituto Renova
 
 {% else %}
 
-<div class="sin-materiales">
+<div class="sin-materiales-renova">
     <strong>No hay materiales publicados todavía.</strong>
-    <p>Cuando el docente cargue imágenes, esquemas, videos o guías, aparecerán aquí.</p>
+    Cuando el docente publique videos o recursos, aparecerán aquí.
 </div>
 
 {% endif %}
+
+<script>
+    function obtenerIdYoutube(url) {
+        try {
+            const enlace = new URL(url);
+
+            if (enlace.hostname.includes("youtu.be")) {
+                return enlace.pathname.replace("/", "");
+            }
+
+            if (enlace.hostname.includes("youtube.com")) {
+                return enlace.searchParams.get("v");
+            }
+
+            return null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    document.querySelectorAll(".video-cover-renova").forEach(function(card) {
+        const url = card.getAttribute("data-video");
+
+        if (!url) {
+            return;
+        }
+
+        const videoId = obtenerIdYoutube(url);
+
+        if (videoId) {
+            const img = document.createElement("img");
+            img.src = "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg";
+            img.alt = "Vista previa del video";
+            card.prepend(img);
+        }
+    });
+</script>
 
 {% endblock %}
