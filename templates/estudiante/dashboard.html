@@ -6,44 +6,394 @@ Panel Estudiante | Instituto Renova
 
 {% block content %}
 
-<div class="page-header">
-    <h1>Hola, {{ current_user.nombre }}</h1>
-    <p>Bienvenido a tu aula virtual. Aquí encontrarás tus cursos, materiales, actividades y evaluaciones.</p>
+<style>
+    .renova-student-hero {
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(circle at top right, #22c55e 0%, #0b3d2e 35%, #071426 100%);
+        color: white;
+        border-radius: 28px;
+        padding: 44px;
+        margin-bottom: 28px;
+        box-shadow: 0 18px 45px rgba(0,0,0,0.22);
+        min-height: 260px;
+    }
+
+    .renova-student-hero::before {
+        content: "RENOVA";
+        position: absolute;
+        right: 35px;
+        top: 30px;
+        font-size: 110px;
+        font-weight: 900;
+        letter-spacing: 4px;
+        color: rgba(255,255,255,0.07);
+        z-index: 1;
+    }
+
+    .renova-student-hero::after {
+        content: "";
+        position: absolute;
+        width: 520px;
+        height: 520px;
+        right: -180px;
+        bottom: -300px;
+        border: 3px solid rgba(34,197,94,0.45);
+        border-radius: 50%;
+        box-shadow: 0 0 35px rgba(34,197,94,0.45);
+    }
+
+    .hero-content-renova {
+        position: relative;
+        z-index: 2;
+        max-width: 720px;
+    }
+
+    .hero-label {
+        display: inline-block;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.22);
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-weight: bold;
+        margin-bottom: 18px;
+        backdrop-filter: blur(8px);
+    }
+
+    .renova-student-hero h1 {
+        margin: 0;
+        font-size: 44px;
+        line-height: 1.1;
+        font-weight: 900;
+    }
+
+    .renova-student-hero h1 span {
+        color: #4ade80;
+    }
+
+    .renova-student-hero p {
+        margin-top: 16px;
+        font-size: 18px;
+        line-height: 1.6;
+        max-width: 620px;
+        color: #e5e7eb;
+    }
+
+    .hero-actions {
+        margin-top: 26px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .hero-btn {
+        display: inline-block;
+        background: #22c55e;
+        color: #052e1b;
+        padding: 14px 22px;
+        border-radius: 16px;
+        text-decoration: none;
+        font-weight: 900;
+        box-shadow: 0 10px 24px rgba(34,197,94,0.35);
+    }
+
+    .hero-btn.secondary {
+        background: rgba(255,255,255,0.12);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.25);
+        box-shadow: none;
+    }
+
+    .renova-section-title {
+        margin: 25px 0 16px;
+    }
+
+    .renova-section-title h2 {
+        color: #0b3d2e;
+        margin: 0;
+        font-size: 28px;
+    }
+
+    .renova-section-title p {
+        margin: 6px 0 0;
+        color: #64748b;
+    }
+
+    .renova-access-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .access-card-renova {
+        position: relative;
+        overflow: hidden;
+        background: white;
+        border-radius: 22px;
+        padding: 22px;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+        border: 1px solid #e5e7eb;
+        min-height: 135px;
+    }
+
+    .access-card-renova::after {
+        content: "R";
+        position: absolute;
+        right: 18px;
+        top: 4px;
+        font-size: 88px;
+        font-weight: 900;
+        color: rgba(11,61,46,0.06);
+    }
+
+    .access-card-renova strong {
+        position: relative;
+        z-index: 2;
+        display: block;
+        color: #0b3d2e;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .access-card-renova span {
+        position: relative;
+        z-index: 2;
+        display: block;
+        color: #475569;
+        line-height: 1.5;
+        font-size: 15px;
+    }
+
+    .renova-course-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 22px;
+    }
+
+    .course-card-renova {
+        position: relative;
+        overflow: hidden;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        background: white;
+        border-radius: 26px;
+        padding: 26px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.10);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .course-card-renova:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 40px rgba(0,0,0,0.16);
+    }
+
+    .course-card-renova::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 8px;
+        background: linear-gradient(90deg, #0b3d2e, #22c55e);
+    }
+
+    .course-card-renova::after {
+        content: "RENOVA";
+        position: absolute;
+        right: 18px;
+        bottom: 14px;
+        font-size: 38px;
+        font-weight: 900;
+        color: rgba(11,61,46,0.06);
+    }
+
+    .course-top {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .renova-seal {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        background: radial-gradient(circle at top left, #4ade80, #0b3d2e 70%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 26px;
+        box-shadow: 0 10px 22px rgba(34,197,94,0.35);
+    }
+
+    .course-card-renova h3 {
+        position: relative;
+        z-index: 2;
+        margin: 0;
+        color: #0b3d2e;
+        font-size: 23px;
+        line-height: 1.25;
+    }
+
+    .course-card-renova p {
+        position: relative;
+        z-index: 2;
+        color: #475569;
+        line-height: 1.6;
+        margin: 12px 0 20px;
+    }
+
+    .course-badge-renova {
+        position: relative;
+        z-index: 2;
+        display: inline-block;
+        background: #0b3d2e;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 14px;
+        font-weight: bold;
+    }
+
+    .empty-renova {
+        background: white;
+        border-radius: 24px;
+        padding: 35px;
+        text-align: center;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+        color: #475569;
+    }
+
+    .empty-renova strong {
+        color: #0b3d2e;
+        font-size: 22px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    @media (max-width: 800px) {
+        .renova-student-hero {
+            padding: 28px;
+        }
+
+        .renova-student-hero h1 {
+            font-size: 34px;
+        }
+
+        .renova-student-hero::before {
+            font-size: 70px;
+            right: 20px;
+            top: 20px;
+        }
+    }
+</style>
+
+<div class="renova-student-hero">
+
+    <div class="hero-content-renova">
+
+        <div class="hero-label">
+            Campus Virtual RENOVA
+        </div>
+
+        <h1>
+            Bienvenido, {{ current_user.nombre }}<br>
+            a tu espacio de <span>aprendizaje</span>
+        </h1>
+
+        <p>
+            Consulta tus cursos, materiales, actividades, evaluaciones, blog académico,
+            calificaciones y certificados desde una experiencia más moderna e institucional.
+        </p>
+
+        <div class="hero-actions">
+            <a href="#mis-cursos" class="hero-btn">
+                Ver mis cursos
+            </a>
+
+            <a href="#accesos" class="hero-btn secondary">
+                Explorar plataforma
+            </a>
+        </div>
+
+    </div>
+
 </div>
 
-<div class="cards">
+<div class="renova-section-title" id="accesos">
+    <h2>Accesos del estudiante</h2>
+    <p>Todo lo que necesitas para avanzar en tu formación.</p>
+</div>
+
+<div class="renova-access-grid">
+
+    <div class="access-card-renova">
+        <strong>Materiales de estudio</strong>
+        <span>Guías, videos, recursos y explicaciones compartidas por tus docentes.</span>
+    </div>
+
+    <div class="access-card-renova">
+        <strong>Actividades</strong>
+        <span>Consulta y desarrolla los compromisos académicos de cada módulo.</span>
+    </div>
+
+    <div class="access-card-renova">
+        <strong>Blog Académico</strong>
+        <span>Lee información ampliada, participa y fortalece tus conocimientos.</span>
+    </div>
+
+    <div class="access-card-renova">
+        <strong>Certificados</strong>
+        <span>Revisa tus constancias, avances y documentos académicos disponibles.</span>
+    </div>
+
+</div>
+
+<div class="renova-section-title" id="mis-cursos">
+    <h2>Mis cursos activos</h2>
+    <p>Seleccione un curso para ingresar a sus módulos.</p>
+</div>
+
+<div class="renova-course-grid">
 
     {% for matricula in matriculas %}
 
     <a
-    class="card"
+    class="course-card-renova"
     href="{{ url_for('estudiante.modulos', curso_id=matricula.curso.id) }}">
 
-        <div class="card-icon">
-            <i class='bx bxs-graduation'></i>
+        <div class="course-top">
+            <div class="renova-seal">
+                R
+            </div>
+
+            <div>
+                <h3>{{ matricula.curso.nombre }}</h3>
+            </div>
         </div>
 
-        <div>
-            <h3>{{ matricula.curso.nombre }}</h3>
+        <p>
+            Matriculado desde:
+            {{ matricula.fecha_matricula.strftime('%d/%m/%Y') }}
+        </p>
 
-            <p>
-                Matriculado desde:
-                {{ matricula.fecha_matricula.strftime('%d/%m/%Y') }}
-            </p>
-
-            <span class="course-badge">
-                Ver contenido del curso
-            </span>
-        </div>
+        <span class="course-badge-renova">
+            Entrar al curso
+        </span>
 
     </a>
 
     {% else %}
 
-    <div class="table-card">
-        <p class="empty-table">
-            No tienes cursos matriculados todavía.
-        </p>
+    <div class="empty-renova">
+        <strong>No tienes cursos matriculados todavía.</strong>
+        Cuando seas matriculado en un curso, aparecerá aquí.
     </div>
 
     {% endfor %}

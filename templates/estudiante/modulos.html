@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 
 {% block title %}
 Módulos | Instituto Renova
@@ -6,72 +6,253 @@ Módulos | Instituto Renova
 
 {% block content %}
 
-<div class="page-header">
-    <h1>Módulos del Curso</h1>
-    <p>Selecciona una opción para consultar el contenido académico.</p>
+<style>
+    .modulos-hero-renova {
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(circle at top right, #22c55e 0%, #0b3d2e 38%, #071426 100%);
+        color: white;
+        border-radius: 28px;
+        padding: 42px;
+        margin-bottom: 30px;
+        box-shadow: 0 18px 45px rgba(0,0,0,0.22);
+    }
+
+    .modulos-hero-renova::before {
+        content: "RENOVA";
+        position: absolute;
+        right: 35px;
+        top: 18px;
+        font-size: 96px;
+        font-weight: 900;
+        color: rgba(255,255,255,0.07);
+        letter-spacing: 5px;
+    }
+
+    .modulos-hero-renova h1 {
+        position: relative;
+        z-index: 2;
+        margin: 0;
+        font-size: 42px;
+        font-weight: 900;
+    }
+
+    .modulos-hero-renova p {
+        position: relative;
+        z-index: 2;
+        margin-top: 12px;
+        max-width: 720px;
+        font-size: 18px;
+        line-height: 1.6;
+        color: #e5e7eb;
+    }
+
+    .modulos-grid-renova {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+        gap: 24px;
+    }
+
+    .modulo-card-renova {
+        position: relative;
+        overflow: hidden;
+        background: white;
+        border-radius: 28px;
+        padding: 30px;
+        box-shadow: 0 14px 36px rgba(0,0,0,0.11);
+        border: 1px solid #e5e7eb;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .modulo-card-renova:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 46px rgba(0,0,0,0.17);
+    }
+
+    .modulo-card-renova::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 9px;
+        background: linear-gradient(90deg, #0b3d2e, #22c55e);
+    }
+
+    .modulo-card-renova::after {
+        content: "RENOVA";
+        position: absolute;
+        right: 18px;
+        bottom: 8px;
+        font-size: 44px;
+        font-weight: 900;
+        color: rgba(11,61,46,0.055);
+        letter-spacing: 2px;
+    }
+
+    .modulo-numero {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 58px;
+        height: 58px;
+        border-radius: 20px;
+        background: radial-gradient(circle at top left, #4ade80, #0b3d2e 70%);
+        color: white;
+        font-size: 24px;
+        font-weight: 900;
+        box-shadow: 0 10px 24px rgba(34,197,94,0.35);
+        margin-bottom: 18px;
+    }
+
+    .modulo-card-renova h2 {
+        position: relative;
+        z-index: 2;
+        margin: 0 0 12px;
+        color: #0b3d2e;
+        font-size: 28px;
+        line-height: 1.25;
+    }
+
+    .modulo-card-renova p {
+        position: relative;
+        z-index: 2;
+        color: #475569;
+        line-height: 1.7;
+        margin-bottom: 24px;
+        font-size: 16px;
+    }
+
+    .modulo-actions-renova {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .modulo-btn-renova {
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        padding: 13px 12px;
+        border-radius: 15px;
+        font-weight: 900;
+        color: white;
+        background: #0b3d2e;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .modulo-btn-renova:hover {
+        transform: translateY(-2px);
+        background: #16805f;
+    }
+
+    .modulo-btn-renova.blog {
+        background: linear-gradient(135deg, #166534, #22c55e);
+        color: #052e1b;
+    }
+
+    .modulo-btn-renova.exam {
+        background: #071426;
+    }
+
+    .modulo-btn-renova.activity {
+        background: #145c45;
+    }
+
+    .empty-renova {
+        background: white;
+        border-radius: 24px;
+        padding: 35px;
+        text-align: center;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+        color: #475569;
+    }
+
+    .empty-renova strong {
+        color: #0b3d2e;
+        font-size: 22px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    @media (max-width: 800px) {
+        .modulos-hero-renova {
+            padding: 28px;
+        }
+
+        .modulos-hero-renova h1 {
+            font-size: 34px;
+        }
+
+        .modulos-hero-renova::before {
+            font-size: 58px;
+            right: 18px;
+            top: 20px;
+        }
+
+        .modulo-actions-renova {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="modulos-hero-renova">
+    <h1>Módulos del curso</h1>
+    <p>
+        Avance por cada unidad académica, consulte materiales, participe en el Blog Académico,
+        desarrolle actividades y presente sus evaluaciones desde un espacio más moderno.
+    </p>
 </div>
 
-{% for modulo in modulos %}
+<div class="modulos-grid-renova">
 
-<div class="table-card">
+    {% for modulo in modulos %}
 
-    <h2>{{ modulo.orden }}. {{ modulo.titulo }}</h2>
+    <div class="modulo-card-renova">
 
-    <p>
-        {{ modulo.descripcion }}
-    </p>
+        <div class="modulo-numero">
+            {{ modulo.orden }}
+        </div>
 
-    <div class="modulo-actions">
+        <h2>{{ modulo.titulo }}</h2>
 
-        <a
-        href="{{ url_for('estudiante.materiales', modulo_id=modulo.id) }}"
-        class="modulo-btn">
+        <p>
+            {{ modulo.descripcion }}
+        </p>
 
-            <i class='bx bx-book'></i>
-            Materiales
+        <div class="modulo-actions-renova">
 
-        </a>
+            <a href="{{ url_for('estudiante.materiales', modulo_id=modulo.id) }}" class="modulo-btn-renova">
+                Materiales
+            </a>
 
+            <a href="{{ url_for('estudiante.blog_modulo', modulo_id=modulo.id) }}" class="modulo-btn-renova blog">
+                Blog Académico
+            </a>
 
-        <a
-        href="{{ url_for('estudiante.blog_modulo', modulo_id=modulo.id) }}"
-        class="modulo-btn">
+            <a href="{{ url_for('estudiante.actividades', modulo_id=modulo.id) }}" class="modulo-btn-renova activity">
+                Actividades
+            </a>
 
-            <i class='bx bx-news'></i>
-            Blog Académico
+            <a href="{{ url_for('estudiante.examenes', modulo_id=modulo.id) }}" class="modulo-btn-renova exam">
+                Exámenes
+            </a>
 
-        </a>
-
-        <a
-        href="{{ url_for('estudiante.actividades', modulo_id=modulo.id) }}"
-        class="modulo-btn">
-
-            <i class='bx bx-edit'></i>
-            Actividades
-
-        </a>
-
-        <a
-        href="{{ url_for('estudiante.examenes', modulo_id=modulo.id) }}"
-        class="modulo-btn">
-
-            <i class='bx bx-task'></i>
-            Exámenes
-
-        </a>
+        </div>
 
     </div>
 
+    {% else %}
+
+    <div class="empty-renova">
+        <strong>Este curso aún no tiene módulos disponibles.</strong>
+        Cuando el docente publique módulos, aparecerán aquí.
+    </div>
+
+    {% endfor %}
+
 </div>
-
-{% else %}
-
-<div class="table-card">
-    <p class="empty-table">
-        Este curso aún no tiene módulos disponibles.
-    </p>
-</div>
-
-{% endfor %}
 
 {% endblock %}
