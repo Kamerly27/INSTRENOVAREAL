@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 
 {% block title %}
 Blog Académico | Instituto Renova
@@ -7,114 +7,403 @@ Blog Académico | Instituto Renova
 {% block content %}
 
 <style>
-    .blog-hero {
-        background: linear-gradient(135deg, #0b3d2e, #16805f);
+    .blog-hero-renova {
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(circle at top right, #22c55e 0%, #0b3d2e 38%, #071426 100%);
         color: white;
-        padding: 30px;
-        border-radius: 24px;
-        margin-bottom: 25px;
-        box-shadow: 0 14px 32px rgba(0,0,0,0.18);
+        border-radius: 28px;
+        padding: 42px;
+        margin-bottom: 30px;
+        box-shadow: 0 18px 45px rgba(0,0,0,0.22);
     }
 
-    .blog-card {
+    .blog-hero-renova::before {
+        content: "RENOVA";
+        position: absolute;
+        right: 35px;
+        top: 18px;
+        font-size: 96px;
+        font-weight: 900;
+        color: rgba(255,255,255,0.07);
+        letter-spacing: 5px;
+    }
+
+    .blog-hero-renova h1 {
+        position: relative;
+        z-index: 2;
+        margin: 0;
+        font-size: 42px;
+        font-weight: 900;
+    }
+
+    .blog-hero-renova p {
+        position: relative;
+        z-index: 2;
+        margin-top: 12px;
+        max-width: 780px;
+        font-size: 18px;
+        line-height: 1.6;
+        color: #e5e7eb;
+    }
+
+    .blog-grid-renova {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 26px;
+    }
+
+    .blog-card-renova {
         background: white;
-        border-radius: 22px;
-        padding: 24px;
-        margin-bottom: 22px;
-        box-shadow: 0 10px 28px rgba(0,0,0,0.10);
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 14px 36px rgba(0,0,0,0.12);
+        border: 1px solid #e5e7eb;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .blog-card h2 {
+    .blog-card-renova:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 46px rgba(0,0,0,0.17);
+    }
+
+    .blog-video-cover {
+        position: relative;
+        display: none;
+        height: 230px;
+        background: linear-gradient(135deg, #0b3d2e, #22c55e);
+        overflow: hidden;
+        text-decoration: none;
+    }
+
+    .blog-video-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .blog-video-cover::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(7,20,38,0.10), rgba(7,20,38,0.58));
+    }
+
+    .blog-fondo-renova {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.9);
+        font-size: 46px;
+        font-weight: 900;
+        letter-spacing: 3px;
+    }
+
+    .play-blog-renova {
+        position: absolute;
+        z-index: 3;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 78px;
+        height: 78px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.94);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.30);
+    }
+
+    .play-blog-renova span {
+        width: 0;
+        height: 0;
+        border-top: 17px solid transparent;
+        border-bottom: 17px solid transparent;
+        border-left: 25px solid #0b3d2e;
+        margin-left: 6px;
+    }
+
+    .blog-content-renova {
+        padding: 26px;
+    }
+
+    .etiqueta-blog-renova {
+        display: inline-block;
+        background: #ecfdf5;
         color: #0b3d2e;
-        margin-top: 0;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 900;
+        margin-bottom: 14px;
     }
 
-    .blog-texto {
-        white-space: pre-line;
+    .blog-content-renova h2 {
+        color: #0b3d2e;
+        margin: 0 0 12px;
+        font-size: 25px;
+        line-height: 1.25;
+    }
+
+    .blog-texto-renova {
+        color: #475569;
         line-height: 1.7;
+        font-size: 16px;
+        margin-bottom: 18px;
+        white-space: pre-line;
+    }
+
+    .fecha-blog {
+        display: block;
+        color: #64748b;
+        margin-bottom: 18px;
+        font-size: 14px;
+    }
+
+    .btn-video-blog {
+        display: none;
+        background: #0b3d2e;
+        color: white;
+        padding: 13px 20px;
+        border-radius: 15px;
+        text-decoration: none;
+        font-weight: 900;
+        margin-bottom: 20px;
+    }
+
+    .btn-video-blog:hover {
+        background: #16805f;
+    }
+
+    .comentarios-renova {
+        margin-top: 22px;
+        background: #f8fafc;
+        border-radius: 20px;
+        padding: 18px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .comentarios-renova strong {
+        color: #0b3d2e;
+        font-size: 18px;
+    }
+
+    .comentario-renova {
+        background: white;
+        border-radius: 14px;
+        padding: 12px;
+        margin-top: 12px;
+        border: 1px solid #e5e7eb;
         color: #374151;
     }
 
-    .comentarios {
-        margin-top: 20px;
-        background: #f8fafc;
-        padding: 15px;
-        border-radius: 16px;
+    .comentario-renova small {
+        color: #64748b;
     }
 
-    .comentario {
-        border-bottom: 1px solid #e5e7eb;
-        padding: 10px 0;
-    }
-
-    textarea {
+    .comentarios-renova textarea {
         width: 100%;
-        min-height: 80px;
-        padding: 12px;
-        border-radius: 12px;
+        min-height: 90px;
+        padding: 13px;
+        border-radius: 14px;
         border: 1px solid #cbd5e1;
         box-sizing: border-box;
-        margin-top: 12px;
+        margin-top: 14px;
+        resize: vertical;
+        font-size: 15px;
     }
 
-    button {
+    .comentarios-renova button {
         background: #0b3d2e;
         color: white;
         border: none;
-        padding: 10px 16px;
-        border-radius: 10px;
-        font-weight: bold;
-        margin-top: 8px;
+        padding: 11px 18px;
+        border-radius: 12px;
+        font-weight: 900;
+        margin-top: 10px;
         cursor: pointer;
+    }
+
+    .sin-blog-renova {
+        background: white;
+        border-radius: 24px;
+        padding: 35px;
+        text-align: center;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+        color: #475569;
+    }
+
+    .sin-blog-renova strong {
+        color: #0b3d2e;
+        font-size: 22px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    @media (max-width: 800px) {
+        .blog-hero-renova {
+            padding: 28px;
+        }
+
+        .blog-hero-renova h1 {
+            font-size: 34px;
+        }
+
+        .blog-hero-renova::before {
+            font-size: 58px;
+            right: 18px;
+            top: 20px;
+        }
     }
 </style>
 
-<div class="blog-hero">
+<div class="blog-hero-renova">
     <h1>Blog Académico</h1>
-    <p>Lecturas, explicaciones ampliadas y participación del módulo.</p>
+    <p>
+        Lecturas, explicaciones ampliadas, videos de apoyo y participación académica del módulo.
+    </p>
 </div>
 
-{% for publicacion in publicaciones %}
+{% if publicaciones %}
 
-<div class="blog-card">
+<div class="blog-grid-renova">
 
-    <h2>{{ publicacion.titulo }}</h2>
+    {% for publicacion in publicaciones %}
 
-    <div class="blog-texto">
-        {{ publicacion.descripcion }}
-    </div>
+    <div class="blog-card-renova">
 
-    <small>
-        Publicado el {{ publicacion.fecha_creacion.strftime('%d/%m/%Y') }}
-    </small>
-
-    <div class="comentarios">
-        <strong>Comentarios</strong>
-
-        {% for comentario in comentarios_por_foro.get(publicacion.id, []) %}
-            <div class="comentario">
-                {{ comentario.comentario }}
-                <br>
-                <small>{{ comentario.fecha_comentario.strftime('%d/%m/%Y') }}</small>
+        <a href="#" target="_blank" class="blog-video-cover">
+            <div class="blog-fondo-renova">
+                RENOVA
             </div>
-        {% else %}
-            <p>No hay comentarios todavía.</p>
-        {% endfor %}
 
-        <form method="POST" action="{{ url_for('estudiante.comentar_blog', foro_id=publicacion.id) }}">
-            <textarea name="comentario" placeholder="Escriba su comentario o aporte..." required></textarea>
-            <button type="submit">Comentar</button>
-        </form>
+            <div class="play-blog-renova">
+                <span></span>
+            </div>
+        </a>
+
+        <div class="blog-content-renova">
+
+            <span class="etiqueta-blog-renova">
+                Publicación académica
+            </span>
+
+            <h2>{{ publicacion.titulo }}</h2>
+
+            <div class="blog-texto-renova">
+                {{ publicacion.descripcion }}
+            </div>
+
+            <small class="fecha-blog">
+                Publicado el {{ publicacion.fecha_creacion.strftime('%d/%m/%Y') }}
+            </small>
+
+            <a href="#" target="_blank" class="btn-video-blog">
+                Ver video del blog
+            </a>
+
+            <div class="comentarios-renova">
+                <strong>Comentarios</strong>
+
+                {% for comentario in comentarios_por_foro.get(publicacion.id, []) %}
+
+                    <div class="comentario-renova">
+                        {{ comentario.comentario }}
+                        <br>
+                        <small>{{ comentario.fecha_comentario.strftime('%d/%m/%Y') }}</small>
+                    </div>
+
+                {% else %}
+
+                    <p>No hay comentarios todavía.</p>
+
+                {% endfor %}
+
+                <form method="POST" action="{{ url_for('estudiante.comentar_blog', foro_id=publicacion.id) }}">
+                    <textarea name="comentario" placeholder="Escriba su comentario o aporte..." required></textarea>
+                    <button type="submit">Comentar</button>
+                </form>
+            </div>
+
+        </div>
+
     </div>
+
+    {% endfor %}
 
 </div>
 
 {% else %}
 
-<div class="blog-card">
-    No hay publicaciones del blog todavía.
+<div class="sin-blog-renova">
+    <strong>No hay publicaciones del blog todavía.</strong>
+    Cuando el docente publique contenido ampliado, aparecerá aquí.
 </div>
 
-{% endfor %}
+{% endif %}
+
+<script>
+    function buscarYoutube(texto) {
+        const regex = /(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[^\s]+)/i;
+        const encontrado = texto.match(regex);
+
+        if (!encontrado) {
+            return null;
+        }
+
+        return encontrado[0].replace(/[),.;]+$/, "");
+    }
+
+    function obtenerIdYoutube(url) {
+        try {
+            const enlace = new URL(url);
+
+            if (enlace.hostname.includes("youtu.be")) {
+                return enlace.pathname.replace("/", "");
+            }
+
+            if (enlace.hostname.includes("youtube.com")) {
+                return enlace.searchParams.get("v");
+            }
+
+            return null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    document.querySelectorAll(".blog-card-renova").forEach(function(card) {
+        const texto = card.querySelector(".blog-texto-renova").innerText;
+        const urlVideo = buscarYoutube(texto);
+
+        if (!urlVideo) {
+            return;
+        }
+
+        const videoId = obtenerIdYoutube(urlVideo);
+
+        if (!videoId) {
+            return;
+        }
+
+        const cover = card.querySelector(".blog-video-cover");
+        const boton = card.querySelector(".btn-video-blog");
+
+        const img = document.createElement("img");
+        img.src = "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg";
+        img.alt = "Vista previa del video";
+
+        cover.prepend(img);
+        cover.href = urlVideo;
+        cover.style.display = "block";
+
+        boton.href = urlVideo;
+        boton.style.display = "inline-block";
+    });
+</script>
 
 {% endblock %}
