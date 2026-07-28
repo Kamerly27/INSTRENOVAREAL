@@ -4,6 +4,9 @@ from io import BytesIO
 import uuid
 import os
 
+from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
+
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
@@ -14,6 +17,16 @@ from models.curso import Curso
 from models.matricula import Matricula
 from models.certificado import Certificado
 from models.mensaje import Mensaje
+
+from models.modulo import Modulo
+from models.material import Material
+from models.actividad import Actividad
+from models.examen import Examen
+from models.calificacion import Calificacion
+from models.foro import Foro
+from models.comentario_foro import ComentarioForo
+from models.ingreso_curso import IngresoCurso
+from models.entrega_actividad import EntregaActividad
 
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
@@ -50,10 +63,15 @@ def crear_usuario():
             activo=True
         )
 
-        db.session.add(nuevo_usuario)
-        db.session.commit()
+        try:
+            db.session.add(nuevo_usuario)
+            db.session.commit()
+            return redirect(url_for('admin.usuarios'))
 
-        return redirect(url_for('admin.usuarios'))
+        except IntegrityError:
+            db.session.rollback()
+            flash('No se pudo crear el usuario. Revise si el correo o documento ya existe.')
+            return redirect(url_for('admin.crear_usuario'))
 
     return render_template('admin/crear_usuario.html')
 
@@ -71,8 +89,14 @@ def editar_usuario(id):
         usuario.rol = request.form.get('rol')
         usuario.activo = True if request.form.get('activo') == '1' else False
 
-        db.session.commit()
-        return redirect(url_for('admin.usuarios'))
+        try:
+            db.session.commit()
+            return redirect(url_for('admin.usuarios'))
+
+        except IntegrityError:
+            db.session.rollback()
+            flash('No se pudo editar el usuario. Revise si el correo o documento ya existe.')
+            return redirect(url_for('admin.editar_usuario', id=id))
 
     return render_template('admin/editar_usuario.html', usuario=usuario)
 
@@ -80,9 +104,59 @@ def editar_usuario(id):
 @admin.route('/usuarios/eliminar/<int:id>')
 def eliminar_usuario(id):
     usuario = Usuario.query.get_or_404(id)
-    db.session.delete(usuario)
-    db.session.commit()
-    return redirect(url_for('admin.usuarios'))
+
+    cursos_docente = Curso.query.filter_by(docente_id=usuario.id).all()
+
+    if cursos_docente:
+        usuario.activo = False
+        db.session.commit()
+        flash('El docente tiene cursos asignados. Por seguridad no se borró; quedó desactivado.')
+        return redirect(url_for('admin.usuarios'))
+
+    try:
+        Mensaje.query.filter(
+            or_(
+                Mensaje.remitente_id == usuario.id,
+                Mensaje.destinatario_id == usuario.id
+            )
+        ).delete(synchronize_session=False)
+
+        ComentarioForo.query.filter_by(
+            usuario_id=usuario.id
+        ).delete(synchronize_session=False)
+
+        Calificacion.query.filter_by(
+            estudiante_id=usuario.id
+        ).delete(synchronize_session=False)
+
+        Certificado.query.filter_by(
+            estudiante_id=usuario.id
+        ).delete(synchronize_session=False)
+
+        Matricula.query.filter_by(
+            estudiante_id=usuario.id
+        ).delete(synchronize_session=False)
+
+        IngresoCurso.query.filter_by(
+            estudiante_id=usuario.id
+        ).delete(synchronize_session=False)
+
+        EntregaActividad.query.filter_by(
+            estudiante_id=usuario.id
+        ).delete(synchronize_session=False)
+
+        db.session.delete(usuario)
+        db.session.commit()
+
+        flash('Usuario eliminado correctamente.')
+        return redirect(url_for('admin.usuarios'))
+
+    except IntegrityError:
+        db.session.rollback()
+        usuario.activo = False
+        db.session.commit()
+        flash('No se pudo borrar por datos relacionados. El usuario quedó desactivado.')
+        return redirect(url_for('admin.usuarios'))
 
 
 @admin.route('/cursos')
@@ -131,8 +205,21 @@ def editar_curso(id):
 @admin.route('/cursos/eliminar/<int:id>')
 def eliminar_curso(id):
     curso = Curso.query.get_or_404(id)
+
+    tiene_matriculas = Matricula.query.filter_by(curso_id=curso.id).first()
+    tiene_certificados = Certificado.query.filter_by(curso_id=curso.id).first()
+    tiene_modulos = Modulo.query.filter_by(curso_id=curso.id).first()
+
+    if tiene_matriculas or tiene_certificados or tiene_modulos:
+        curso.activo = False
+        db.session.commit()
+        flash('El curso tiene información relacionada. Por seguridad no se borró; quedó desactivado.')
+        return redirect(url_for('admin.cursos'))
+
     db.session.delete(curso)
     db.session.commit()
+
+    flash('Curso eliminado correctamente.')
     return redirect(url_for('admin.cursos'))
 
 
@@ -154,10 +241,15 @@ def crear_matricula():
             estado='activa'
         )
 
-        db.session.add(nueva_matricula)
-        db.session.commit()
+        try:
+            db.session.add(nueva_matricula)
+            db.session.commit()
+            return redirect(url_for('admin.matriculas'))
 
-        return redirect(url_for('admin.matriculas'))
+        except IntegrityError:
+            db.session.rollback()
+            flash('No se pudo crear la matrícula. Revise si el estudiante ya está matriculado en ese curso.')
+            return redirect(url_for('admin.crear_matricula'))
 
     return render_template(
         'admin/crear_matricula.html',
