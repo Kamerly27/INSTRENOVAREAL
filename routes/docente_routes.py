@@ -1,6 +1,7 @@
 import cloudinary
 import cloudinary.uploader
 import os
+
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 from datetime import datetime
@@ -49,13 +50,20 @@ def dashboard():
 
         for matricula in matriculas:
 
+            estudiante = Usuario.query.get(matricula.estudiante_id)
+
+            if estudiante:
+                estudiante_nombre = estudiante.nombre
+            else:
+                estudiante_nombre = 'Estudiante eliminado o matrícula dañada'
+
             ingreso = IngresoCurso.query.filter_by(
                 estudiante_id=matricula.estudiante_id,
                 curso_id=curso.id
             ).first()
 
             ingresos_estudiantes.append({
-                'estudiante': matricula.estudiante.nombre,
+                'estudiante': estudiante_nombre,
                 'curso': curso.nombre,
                 'fecha': ingreso.fecha_ingreso if ingreso else None,
                 'estado': 'Ingresó' if ingreso else 'No ha ingresado'
@@ -74,7 +82,14 @@ def dashboard():
         if not actividad:
             continue
 
-        modulo = Modulo.query.get(actividad.modulo_id)
+        modulo = Modulo.query.get(actividad.mod    for entrega in entregas:
+
+        actividad = Actividad.query.get(entrega.actividad_id)
+
+        if not actividad:
+            continue
+
+        moduloulo_id)
 
         if not modulo:
             continue
@@ -86,8 +101,8 @@ def dashboard():
         curso = Curso.query.get(modulo.curso_id)
 
         entregas_recientes.append({
-            'estudiante': estudiante.nombre if estudiante else 'Estudiante',
-            'curso': curso.nombre if curso else 'Curso',
+            'estudiante': estudiante.nombre if estudiante else 'Estudiante eliminado',
+            'curso': curso.nombre if curso else 'Curso eliminado',
             'actividad': actividad.titulo,
             'fecha': entrega.fecha_entrega,
             'enlace': entrega.enlace,
@@ -509,10 +524,13 @@ def crear_calificacion(examen_id):
         curso_id=modulo.curso_id
     ).all()
 
-    estudiantes = [
-        matricula.estudiante
-        for matricula in matriculas
-    ]
+    estudiantes = []
+
+    for matricula in matriculas:
+        estudiante = Usuario.query.get(matricula.estudiante_id)
+
+        if estudiante:
+            estudiantes.append(estudiante)
 
     if request.method == 'POST':
 
