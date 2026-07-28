@@ -82,14 +82,7 @@ def dashboard():
         if not actividad:
             continue
 
-        modulo = Modulo.query.get(actividad.mod    for entrega in entregas:
-
-        actividad = Actividad.query.get(entrega.actividad_id)
-
-        if not actividad:
-            continue
-
-        moduloulo_id)
+        modulo = Modulo.query.get(actividad.modulo_id)
 
         if not modulo:
             continue
