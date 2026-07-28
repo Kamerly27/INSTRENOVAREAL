@@ -23,15 +23,10 @@ Panel Docente | Instituto Renova
         </div>
 
         <div>
-
-            <h3>
-                Calificar actividades
-            </h3>
-
+            <h3>Calificar actividades</h3>
             <p>
                 Revisar entregas de estudiantes, abrir archivos PDF, registrar nota y observación.
             </p>
-
         </div>
 
     </a>
@@ -47,15 +42,8 @@ Panel Docente | Instituto Renova
         </div>
 
         <div>
-
-            <h3>
-                {{ curso.nombre }}
-            </h3>
-
-            <p>
-                {{ curso.descripcion }}
-            </p>
-
+            <h3>{{ curso.nombre }}</h3>
+            <p>{{ curso.descripcion }}</p>
         </div>
 
     </a>
@@ -63,16 +51,94 @@ Panel Docente | Instituto Renova
     {% else %}
 
     <div class="table-card">
-
         <p class="empty-table">
-
             Aún no tienes cursos asignados.
-
         </p>
-
     </div>
 
     {% endfor %}
+
+</div>
+
+
+<div class="table-card" style="margin-top: 30px;">
+
+    <h2>Ingreso de estudiantes a cursos</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Estudiante</th>
+                <th>Curso</th>
+                <th>Último ingreso</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in ingresos_estudiantes %}
+            <tr>
+                <td>{{ item.estudiante }}</td>
+                <td>{{ item.curso }}</td>
+                <td>
+                    {% if item.fecha %}
+                        {{ item.fecha.strftime('%d/%m/%Y %I:%M %p') }}
+                    {% else %}
+                        Sin ingreso
+                    {% endif %}
+                </td>
+                <td>{{ item.estado }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">Aún no hay estudiantes matriculados en tus cursos.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+
+<div class="table-card" style="margin-top: 30px;">
+
+    <h2>Entregas recientes de estudiantes</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Estudiante</th>
+                <th>Curso</th>
+                <th>Actividad</th>
+                <th>Fecha de entrega</th>
+                <th>Entrega</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for entrega in entregas_recientes %}
+            <tr>
+                <td>{{ entrega.estudiante }}</td>
+                <td>{{ entrega.curso }}</td>
+                <td>{{ entrega.actividad }}</td>
+                <td>{{ entrega.fecha.strftime('%d/%m/%Y %I:%M %p') }}</td>
+                <td>
+                    {% if entrega.enlace %}
+                    <a href="{{ entrega.enlace }}" target="_blank">
+                        Abrir entrega
+                    </a>
+                    {% else %}
+                    Sin enlace
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">Aún no hay entregas registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 </div>
 

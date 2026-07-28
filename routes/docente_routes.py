@@ -1,8 +1,6 @@
 import cloudinary
 import cloudinary.uploader
 import os
-import uuid
-from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 from datetime import datetime
@@ -19,6 +17,8 @@ from models.actividad import Actividad
 from models.examen import Examen
 from models.calificacion import Calificacion
 from models.mensaje import Mensaje
+from models.ingreso_curso import IngresoCurso
+from models.entrega_actividad import EntregaActividad
 
 
 docente = Blueprint(
@@ -37,9 +37,71 @@ def dashboard():
         activo=True
     ).all()
 
+    ids_cursos = [curso.id for curso in cursos]
+
+    ingresos_estudiantes = []
+
+    for curso in cursos:
+
+        matriculas = Matricula.query.filter_by(
+            curso_id=curso.id
+        ).all()
+
+        for matricula in matriculas:
+
+            ingreso = IngresoCurso.query.filter_by(
+                estudiante_id=matricula.estudiante_id,
+                curso_id=curso.id
+            ).first()
+
+            ingresos_estudiantes.append({
+                'estudiante': matricula.estudiante.nombre,
+                'curso': curso.nombre,
+                'fecha': ingreso.fecha_ingreso if ingreso else None,
+                'estado': 'Ingresó' if ingreso else 'No ha ingresado'
+            })
+
+    entregas_recientes = []
+
+    entregas = EntregaActividad.query.order_by(
+        EntregaActividad.fecha_entrega.desc()
+    ).all()
+
+    for entrega in entregas:
+
+        actividad = Actividad.query.get(entrega.actividad_id)
+
+        if not actividad:
+            continue
+
+        modulo = Modulo.query.get(actividad.modulo_id)
+
+        if not modulo:
+            continue
+
+        if modulo.curso_id not in ids_cursos:
+            continue
+
+        estudiante = Usuario.query.get(entrega.estudiante_id)
+        curso = Curso.query.get(modulo.curso_id)
+
+        entregas_recientes.append({
+            'estudiante': estudiante.nombre if estudiante else 'Estudiante',
+            'curso': curso.nombre if curso else 'Curso',
+            'actividad': actividad.titulo,
+            'fecha': entrega.fecha_entrega,
+            'enlace': entrega.enlace,
+            'comentario': entrega.comentario
+        })
+
+        if len(entregas_recientes) >= 10:
+            break
+
     return render_template(
         'docente/dashboard.html',
-        cursos=cursos
+        cursos=cursos,
+        ingresos_estudiantes=ingresos_estudiantes,
+        entregas_recientes=entregas_recientes
     )
 
 
@@ -169,6 +231,7 @@ def crear_material(modulo_id):
         'docente/crear_material.html',
         modulo=modulo
     )
+
 
 @docente.route('/material/<int:id>/editar', methods=['GET', 'POST'])
 @login_required

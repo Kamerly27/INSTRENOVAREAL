@@ -17,13 +17,11 @@ Actividades | Instituto Renova
         <thead>
 
             <tr>
-
                 <th>Título</th>
                 <th>Descripción</th>
                 <th>Archivo</th>
                 <th>Fecha de entrega</th>
                 <th>Entrega</th>
-
             </tr>
 
         </thead>
@@ -32,18 +30,16 @@ Actividades | Instituto Renova
 
         {% for actividad in actividades %}
 
+            {% set entrega = entregas_por_actividad.get(actividad.id) %}
+
             <tr>
 
                 <td>
-
                     {{ actividad.titulo }}
-
                 </td>
 
                 <td>
-
                     {{ actividad.descripcion }}
-
                 </td>
 
                 <td>
@@ -83,14 +79,40 @@ Actividades | Instituto Renova
 
                 <td>
 
-                    <a
-                    href="https://forms.gle/fKhhHugjW6FeZ5qZ6"
-                    target="_blank"
-                    class="btn-small">
+                    {% if entrega %}
 
-                        📤 Entregar actividad
+                        <p style="margin-bottom: 8px;">
+                            ✅ Entrega registrada
+                        </p>
 
-                    </a>
+                        <p style="font-size: 13px; margin-bottom: 8px;">
+                            {{ entrega.fecha_entrega.strftime('%d/%m/%Y %I:%M %p') }}
+                        </p>
+
+                    {% endif %}
+
+                    <form
+                    method="POST"
+                    action="{{ url_for('estudiante.entregar_actividad', actividad_id=actividad.id) }}">
+
+                        <input
+                        type="url"
+                        name="enlace"
+                        placeholder="Pegue aquí el enlace de su entrega"
+                        value="{{ entrega.enlace if entrega else '' }}"
+                        required
+                        style="width: 100%; margin-bottom: 8px; padding: 8px;">
+
+                        <textarea
+                        name="comentario"
+                        placeholder="Comentario opcional"
+                        style="width: 100%; margin-bottom: 8px; padding: 8px;">{{ entrega.comentario if entrega else '' }}</textarea>
+
+                        <button type="submit" class="btn-small">
+                            📤 Guardar entrega
+                        </button>
+
+                    </form>
 
                 </td>
 
@@ -101,9 +123,7 @@ Actividades | Instituto Renova
             <tr>
 
                 <td colspan="5" class="empty-table">
-
                     Este módulo no tiene actividades.
-
                 </td>
 
             </tr>
