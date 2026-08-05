@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 
@@ -13,6 +14,7 @@ from models.examen import Examen
 from models.calificacion import Calificacion
 from models.mensaje import Mensaje
 from models.certificado import Certificado
+from models.entrega_actividad import EntregaActividad
 
 
 estudiante = Blueprint(
@@ -229,3 +231,35 @@ def comentar_blog(foro_id):
         db.session.commit()
 
     return redirect(url_for('estudiante.blog_modulo', modulo_id=foro.modulo_id))
+
+
+@estudiante.route('/actividad/<int:actividad_id>/entregar', methods=['POST'])
+@login_required
+def entregar_actividad(actividad_id):
+
+    actividad = Actividad.query.get_or_404(actividad_id)
+
+    enlace = request.form.get('enlace', '').strip()
+    comentario = request.form.get('comentario', '').strip()
+
+    entrega = EntregaActividad.query.filter_by(
+        estudiante_id=current_user.id,
+        actividad_id=actividad_id
+    ).first()
+
+    if entrega:
+        entrega.enlace = enlace
+        entrega.comentario = comentario
+        entrega.fecha_entrega = datetime.utcnow()
+    else:
+        entrega = EntregaActividad(
+            estudiante_id=current_user.id,
+            actividad_id=actividad_id,
+            enlace=enlace,
+            comentario=comentario
+        )
+        db.session.add(entrega)
+
+    db.session.commit()
+
+    return redirect(url_for('estudiante.actividades', modulo_id=actividad.modulo_id))
