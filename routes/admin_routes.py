@@ -435,3 +435,8 @@ def enviar_mensaje():
         'admin/enviar_mensaje.html',
         usuarios=usuarios
     )
+
+@admin.route('/crear-tablas-seguimiento')
+def crear_tablas_seguimiento():
+    db.create_all()
+    return 'TABLAS CREADAS CORRECTAMENTE'
