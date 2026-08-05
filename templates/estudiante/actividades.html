@@ -30,7 +30,11 @@ Actividades | Instituto Renova
 
         {% for actividad in actividades %}
 
-            {% set entrega = entregas_por_actividad.get(actividad.id) %}
+            {% if entregas_por_actividad is defined %}
+                {% set entrega = entregas_por_actividad.get(actividad.id) %}
+            {% else %}
+                {% set entrega = None %}
+            {% endif %}
 
             <tr>
 
@@ -85,9 +89,11 @@ Actividades | Instituto Renova
                             ✅ Entrega registrada
                         </p>
 
+                        {% if entrega.fecha_entrega %}
                         <p style="font-size: 13px; margin-bottom: 8px;">
                             {{ entrega.fecha_entrega.strftime('%d/%m/%Y %I:%M %p') }}
                         </p>
+                        {% endif %}
 
                     {% endif %}
 
