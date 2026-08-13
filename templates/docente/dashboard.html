@@ -13,6 +13,18 @@ Panel Docente | Instituto Renova
 
 <div class="cards">
 
+    <a class="card" href="{{ url_for('docente.entregas') }}">
+        <div class="card-icon">
+            <i class='bx bxs-check-square'></i>
+        </div>
+        <div>
+            <h3>Calificar entregas en línea</h3>
+            <p>
+                Revisar entregas, colocar nota, retroalimentación y estado de calificación.
+            </p>
+        </div>
+    </a>
+
     <a
     class="card"
     href="https://docs.google.com/spreadsheets/d/1FLawJvucB-3Edqb6SCvdbF0_9164ALtlQugl2a8AYYg/edit#gid=1947901665"
@@ -23,9 +35,9 @@ Panel Docente | Instituto Renova
         </div>
 
         <div>
-            <h3>Calificar actividades</h3>
+            <h3>Calificar actividades externas</h3>
             <p>
-                Revisar entregas de estudiantes, abrir archivos PDF, registrar nota y observación.
+                Acceso anterior a hoja externa de calificación.
             </p>
         </div>
 
@@ -59,7 +71,6 @@ Panel Docente | Instituto Renova
     {% endfor %}
 
 </div>
-
 
 <div class="table-card" style="margin-top: 30px;">
 
@@ -98,7 +109,6 @@ Panel Docente | Instituto Renova
     </table>
 
 </div>
-
 
 <div class="table-card" style="margin-top: 30px;">
 

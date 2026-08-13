@@ -15,15 +15,13 @@ Actividades | Instituto Renova
     <table>
 
         <thead>
-
             <tr>
                 <th>Título</th>
                 <th>Descripción</th>
                 <th>Archivo</th>
                 <th>Fecha de entrega</th>
-                <th>Entrega</th>
+                <th>Entrega y calificación</th>
             </tr>
-
         </thead>
 
         <tbody>
@@ -36,65 +34,72 @@ Actividades | Instituto Renova
                 {% set entrega = None %}
             {% endif %}
 
+            {% if entrega and calificaciones_por_entrega is defined %}
+                {% set calificacion = calificaciones_por_entrega.get(entrega.id) %}
+            {% else %}
+                {% set calificacion = None %}
+            {% endif %}
+
             <tr>
 
-                <td>
-                    {{ actividad.titulo }}
-                </td>
+                <td>{{ actividad.titulo }}</td>
+
+                <td>{{ actividad.descripcion }}</td>
 
                 <td>
-                    {{ actividad.descripcion }}
-                </td>
-
-                <td>
-
                     {% if actividad.archivo_url %}
-
-                        <a
-                        href="{{ actividad.archivo_url }}"
-                        target="_blank"
-                        class="btn-small">
-
+                        <a href="{{ actividad.archivo_url }}" target="_blank" class="btn-small">
                             Abrir archivo
-
                         </a>
-
                     {% else %}
-
                         Sin archivo
-
                     {% endif %}
-
                 </td>
 
                 <td>
-
                     {% if actividad.fecha_entrega %}
-
                         {{ actividad.fecha_entrega.strftime('%d/%m/%Y') }}
-
                     {% else %}
-
                         Sin definir
-
                     {% endif %}
-
                 </td>
 
                 <td>
 
                     {% if entrega %}
-
                         <p style="margin-bottom: 8px;">
                             ✅ Entrega registrada
                         </p>
 
                         {% if entrega.fecha_entrega %}
                         <p style="font-size: 13px; margin-bottom: 8px;">
-                            {{ entrega.fecha_entrega.strftime('%d/%m/%Y %I:%M %p') }}
+                            Fecha: {{ entrega.fecha_entrega.strftime('%d/%m/%Y %I:%M %p') }}
                         </p>
                         {% endif %}
+                    {% endif %}
 
+                    {% if calificacion %}
+                        <div style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px;">
+                            <p><strong>Estado:</strong> {{ calificacion.estado }}</p>
+
+                            <p><strong>Nota:</strong>
+                                {% if calificacion.nota is not none %}
+                                    {{ calificacion.nota }}
+                                {% else %}
+                                    Sin nota
+                                {% endif %}
+                            </p>
+
+                            {% if calificacion.retroalimentacion %}
+                            <p><strong>Retroalimentación:</strong> {{ calificacion.retroalimentacion }}</p>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        {% if entrega %}
+                            <p style="font-size: 13px; margin-bottom: 8px;">
+                                Pendiente por calificar.
+                            </p>
+                        {% endif %}
                     {% endif %}
 
                     <form
@@ -127,11 +132,9 @@ Actividades | Instituto Renova
         {% else %}
 
             <tr>
-
                 <td colspan="5" class="empty-table">
                     Este módulo no tiene actividades.
                 </td>
-
             </tr>
 
         {% endfor %}

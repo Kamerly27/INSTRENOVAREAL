@@ -20,6 +20,7 @@ from models.calificacion import Calificacion
 from models.mensaje import Mensaje
 from models.ingreso_curso import IngresoCurso
 from models.entrega_actividad import EntregaActividad
+from models.calificacion_entrega import CalificacionEntrega
 
 
 docente = Blueprint(
@@ -690,3 +691,114 @@ def eliminar_blog(id):
     db.session.commit()
 
     return redirect(url_for('docente.blog_modulo', modulo_id=modulo_id))
+
+@docente.route('/entregas')
+@login_required
+def entregas():
+
+    cursos = Curso.query.filter_by(
+        docente_id=current_user.id,
+        activo=True
+    ).all()
+
+    ids_cursos = [curso.id for curso in cursos]
+
+    entregas = EntregaActividad.query.order_by(
+        EntregaActividad.fecha_entrega.desc()
+    ).all()
+
+    entregas_docente = []
+
+    for entrega in entregas:
+
+        actividad = Actividad.query.get(entrega.actividad_id)
+
+        if not actividad:
+            continue
+
+        modulo = Modulo.query.get(actividad.modulo_id)
+
+        if not modulo:
+            continue
+
+        if modulo.curso_id not in ids_cursos:
+            continue
+
+        curso = Curso.query.get(modulo.curso_id)
+        estudiante = Usuario.query.get(entrega.estudiante_id)
+
+        calificacion = CalificacionEntrega.query.filter_by(
+            entrega_id=entrega.id
+        ).first()
+
+        entregas_docente.append({
+            'entrega': entrega,
+            'estudiante': estudiante.nombre if estudiante else 'Estudiante eliminado',
+            'curso': curso.nombre if curso else 'Curso eliminado',
+            'modulo': modulo.titulo,
+            'actividad': actividad.titulo,
+            'nota': calificacion.nota if calificacion else None,
+            'estado': calificacion.estado if calificacion else 'Pendiente',
+            'retroalimentacion': calificacion.retroalimentacion if calificacion else ''
+        })
+
+    return render_template(
+        'docente/entregas.html',
+        entregas=entregas_docente
+    )
+
+
+@docente.route('/entrega/<int:entrega_id>/calificar', methods=['GET', 'POST'])
+@login_required
+def calificar_entrega(entrega_id):
+
+    entrega = EntregaActividad.query.get_or_404(entrega_id)
+    actividad = Actividad.query.get_or_404(entrega.actividad_id)
+    modulo = Modulo.query.get_or_404(actividad.modulo_id)
+    curso = Curso.query.get_or_404(modulo.curso_id)
+
+    if curso.docente_id != current_user.id:
+        return redirect(url_for('docente.dashboard'))
+
+    estudiante = Usuario.query.get(entrega.estudiante_id)
+
+    calificacion = CalificacionEntrega.query.filter_by(
+        entrega_id=entrega.id
+    ).first()
+
+    if request.method == 'POST':
+
+        nota_texto = request.form.get('nota', '').strip().replace(',', '.')
+        nota = None
+
+        if nota_texto:
+            nota = float(nota_texto)
+
+        if calificacion:
+            calificacion.nota = nota
+            calificacion.retroalimentacion = request.form.get('retroalimentacion')
+            calificacion.estado = request.form.get('estado')
+            calificacion.fecha_calificacion = datetime.utcnow()
+        else:
+            calificacion = CalificacionEntrega(
+                entrega_id=entrega.id,
+                nota=nota,
+                retroalimentacion=request.form.get('retroalimentacion'),
+                estado=request.form.get('estado'),
+                fecha_calificacion=datetime.utcnow()
+            )
+            db.session.add(calificacion)
+
+        db.session.commit()
+
+        return redirect(url_for('docente.entregas'))
+
+    return render_template(
+        'docente/calificar_entrega.html',
+        entrega=entrega,
+        actividad=actividad,
+        modulo=modulo,
+        curso=curso,
+        estudiante=estudiante,
+        calificacion=calificacion
+    )

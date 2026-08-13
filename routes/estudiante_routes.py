@@ -15,6 +15,7 @@ from models.calificacion import Calificacion
 from models.mensaje import Mensaje
 from models.certificado import Certificado
 from models.entrega_actividad import EntregaActividad
+from models.calificacion_entrega import CalificacionEntrega
 
 
 estudiante = Blueprint(
@@ -74,15 +75,53 @@ def materiales(modulo_id):
 @login_required
 def actividades(modulo_id):
 
+    modulo = Modulo.query.get_or_404(modulo_id)
+
+    try:
+        registrar_ingreso_curso(modulo.curso_id)
+    except Exception:
+        pass
+
     actividades = Actividad.query.filter_by(
         modulo_id=modulo_id
     ).order_by(
         Actividad.fecha_creacion.desc()
     ).all()
 
+    ids_actividades = [actividad.id for actividad in actividades]
+
+    entregas = []
+
+    if ids_actividades:
+        entregas = EntregaActividad.query.filter(
+            EntregaActividad.estudiante_id == current_user.id,
+            EntregaActividad.actividad_id.in_(ids_actividades)
+        ).all()
+
+    entregas_por_actividad = {}
+
+    for entrega in entregas:
+        entregas_por_actividad[entrega.actividad_id] = entrega
+
+    ids_entregas = [entrega.id for entrega in entregas]
+
+    calificaciones = []
+
+    if ids_entregas:
+        calificaciones = CalificacionEntrega.query.filter(
+            CalificacionEntrega.entrega_id.in_(ids_entregas)
+        ).all()
+
+    calificaciones_por_entrega = {}
+
+    for calificacion in calificaciones:
+        calificaciones_por_entrega[calificacion.entrega_id] = calificacion
+
     return render_template(
         'estudiante/actividades.html',
-        actividades=actividades
+        actividades=actividades,
+        entregas_por_actividad=entregas_por_actividad,
+        calificaciones_por_entrega=calificaciones_por_entrega
     )
 
 

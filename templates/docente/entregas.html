@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Entregas en línea | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Entregas en línea</h1>
+    <p>Revisar, calificar y retroalimentar actividades entregadas por estudiantes.</p>
+</div>
+
+<div class="table-card">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Estudiante</th>
+                <th>Curso</th>
+                <th>Módulo</th>
+                <th>Actividad</th>
+                <th>Fecha entrega</th>
+                <th>Estado</th>
+                <th>Nota</th>
+                <th>Archivo</th>
+                <th>Calificar</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in entregas %}
+            <tr>
+                <td>{{ item.estudiante }}</td>
+                <td>{{ item.curso }}</td>
+                <td>{{ item.modulo }}</td>
+                <td>{{ item.actividad }}</td>
+                <td>{{ item.entrega.fecha_entrega.strftime('%d/%m/%Y %I:%M %p') }}</td>
+                <td>{{ item.estado }}</td>
+                <td>
+                    {% if item.nota is not none %}
+                        {{ item.nota }}
+                    {% else %}
+                        Sin nota
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.entrega.enlace %}
+                    <a href="{{ item.entrega.enlace }}" target="_blank" class="btn-small">
+                        Abrir entrega
+                    </a>
+                    {% else %}
+                    Sin enlace
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('docente.calificar_entrega', entrega_id=item.entrega.id) }}" class="btn-small">
+                        Calificar
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9" class="empty-table">
+                    Aún no hay entregas de estudiantes.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

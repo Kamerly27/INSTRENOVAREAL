@@ -1,0 +1,75 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Calificar entrega | Instituto Renova
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Calificar entrega</h1>
+    <p>{{ curso.nombre }} / {{ modulo.titulo }} / {{ actividad.titulo }}</p>
+</div>
+
+<div class="table-card">
+
+    <p><strong>Estudiante:</strong>
+        {% if estudiante %}
+            {{ estudiante.nombre }} {{ estudiante.apellido }}
+        {% else %}
+            Estudiante eliminado
+        {% endif %}
+    </p>
+
+    <p><strong>Entrega:</strong>
+        {% if entrega.enlace %}
+            <a href="{{ entrega.enlace }}" target="_blank">Abrir entrega del estudiante</a>
+        {% else %}
+            Sin enlace
+        {% endif %}
+    </p>
+
+    {% if entrega.comentario %}
+    <p><strong>Comentario del estudiante:</strong> {{ entrega.comentario }}</p>
+    {% endif %}
+
+    <form method="POST">
+
+        <label>Nota</label>
+        <input
+        type="number"
+        step="0.1"
+        name="nota"
+        value="{{ calificacion.nota if calificacion else '' }}"
+        placeholder="Ejemplo: 4.5"
+        style="width: 100%; padding: 10px; margin-bottom: 12px;">
+
+        <label>Estado de calificación</label>
+        <select
+        name="estado"
+        style="width: 100%; padding: 10px; margin-bottom: 12px;">
+            <option value="Pendiente" {% if calificacion and calificacion.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+            <option value="Calificada" {% if calificacion and calificacion.estado == 'Calificada' %}selected{% endif %}>Calificada</option>
+            <option value="Requiere corrección" {% if calificacion and calificacion.estado == 'Requiere corrección' %}selected{% endif %}>Requiere corrección</option>
+        </select>
+
+        <label>Retroalimentación</label>
+        <textarea
+        name="retroalimentacion"
+        rows="6"
+        placeholder="Escriba aquí la retroalimentación para el estudiante"
+        style="width: 100%; padding: 10px; margin-bottom: 12px;">{{ calificacion.retroalimentacion if calificacion else '' }}</textarea>
+
+        <button type="submit" class="btn-small">
+            Guardar calificación
+        </button>
+
+        <a href="{{ url_for('docente.entregas') }}" class="btn-small">
+            Volver
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}
