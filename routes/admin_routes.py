@@ -3,6 +3,9 @@ from werkzeug.security import generate_password_hash
 from io import BytesIO
 import uuid
 import os
+import json
+import urllib.request
+import urllib.error
 
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
@@ -10,6 +13,9 @@ from sqlalchemy.exc import IntegrityError
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
+from reportlab.graphics.barcode import qr
+from reportlab.graphics.shapes import Drawing
+from reportlab.graphics import renderPDF
 
 from database.db import db
 from models.usuario import Usuario
@@ -30,6 +36,66 @@ from models.entrega_actividad import EntregaActividad
 
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
+
+VERIFICATION_API_URL = os.environ.get(
+    "VERIFICATION_API_URL",
+    "https://verificacio-renova.onrender.com/api/certificados/registrar"
+)
+
+VERIFICATION_API_TOKEN = os.environ.get(
+    "VERIFICATION_API_TOKEN",
+    "RENOVA-CERT-2026"
+)
+
+
+def registrar_certificado_en_verificacion(certificado):
+
+    estudiante = Usuario.query.get(certificado.estudiante_id)
+    curso = Curso.query.get(certificado.curso_id)
+
+    if not estudiante or not curso:
+        return False
+
+    tipo_documento = estudiante.tipo_documento or "Documento"
+    numero_documento = estudiante.numero_documento or ""
+
+    documento = f"{tipo_documento} {numero_documento}".strip()
+
+    fecha_grado = certificado.fecha_emision.strftime('%d/%m/%Y')
+
+    datos = {
+        "codigo": certificado.codigo_verificacion,
+        "nombre_estudiante": f"{estudiante.nombre} {estudiante.apellido}",
+        "documento": documento,
+        "titulo_obtenido": curso.nombre,
+        "fecha_grado": fecha_grado,
+        "acta": "No aplica",
+        "libro": "No aplica",
+        "folio": "No aplica",
+        "resolucion": "Certificado generado desde la plataforma académica del Instituto Renova",
+        "estado": "Registrado y válido en el archivo académico institucional"
+    }
+
+    try:
+        req = urllib.request.Request(
+            VERIFICATION_API_URL,
+            data=json.dumps(datos).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "X-RENOVA-TOKEN": VERIFICATION_API_TOKEN
+            },
+            method="POST"
+        )
+
+        with urllib.request.urlopen(req, timeout=12) as respuesta:
+            respuesta.read()
+
+        return True
+
+    except Exception as error:
+        print("No se pudo registrar el certificado en verificación:", error)
+        return False
+
 
 
 @admin.route('/dashboard')
@@ -281,6 +347,13 @@ def generar_certificado():
         db.session.add(nuevo_certificado)
         db.session.commit()
 
+        registrado = registrar_certificado_en_verificacion(nuevo_certificado)
+
+        if registrado:
+            flash(f'Certificado generado y registrado para verificación. Código: {codigo}')
+        else:
+            flash(f'Certificado generado. Código: {codigo}. Revise la plataforma de verificación.')
+
         return redirect(url_for('admin.certificados'))
 
     return render_template(
@@ -294,6 +367,11 @@ def generar_certificado():
 def descargar_certificado(id):
     certificado = Certificado.query.get_or_404(id)
 
+    registrar_certificado_en_verificacion(certificado)
+
+    codigo = certificado.codigo_verificacion
+    url_verificacion = f"https://verificacio-renova.onrender.com/verificar/{codigo}"
+
     buffer = BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=landscape(A4))
     width, height = landscape(A4)
@@ -301,49 +379,59 @@ def descargar_certificado(id):
     base_static = os.path.join(os.getcwd(), 'static')
     logo_path = os.path.join(base_static, 'img', 'logo.png')
 
+    # Fondo
     pdf.setFillColor(colors.HexColor("#F8FAFC"))
     pdf.rect(0, 0, width, height, fill=True, stroke=False)
 
+    # Marco exterior
     pdf.setStrokeColor(colors.HexColor("#0F172A"))
     pdf.setLineWidth(4)
     pdf.rect(35, 35, width - 70, height - 70, fill=False)
 
-    pdf.setStrokeColor(colors.HexColor("#2563EB"))
+    # Marco interior dorado
+    pdf.setStrokeColor(colors.HexColor("#C9A227"))
     pdf.setLineWidth(2)
     pdf.rect(52, 52, width - 104, height - 104, fill=False)
 
+    # Línea decorativa superior
+    pdf.setFillColor(colors.HexColor("#0B3D2E"))
+    pdf.rect(52, height - 92, width - 104, 8, fill=True, stroke=False)
+
+    # Logo
     if os.path.exists(logo_path):
         pdf.drawImage(
             logo_path,
-            width / 2 - 45,
-            height - 132,
-            width=90,
-            height=90,
+            width / 2 - 48,
+            height - 155,
+            width=96,
+            height=96,
             preserveAspectRatio=True,
             mask='auto'
         )
 
+    # Encabezado
     pdf.setFillColor(colors.HexColor("#0F172A"))
-    pdf.setFont("Helvetica-Bold", 28)
-    pdf.drawCentredString(width / 2, height - 165, "INSTITUTO RENOVA")
+    pdf.setFont("Helvetica-Bold", 30)
+    pdf.drawCentredString(width / 2, height - 185, "INSTITUTO RENOVA")
 
     pdf.setFont("Helvetica", 14)
     pdf.drawCentredString(
         width / 2,
-        height - 190,
+        height - 207,
         "Formación para el Trabajo y el Desarrollo Humano"
     )
 
-    pdf.setFillColor(colors.HexColor("#2563EB"))
-    pdf.setFont("Helvetica-Bold", 34)
-    pdf.drawCentredString(width / 2, height - 255, "CERTIFICADO ACADÉMICO")
+    pdf.setFillColor(colors.HexColor("#0B3D2E"))
+    pdf.setFont("Helvetica-Bold", 35)
+    pdf.drawCentredString(width / 2, height - 265, "CERTIFICADO ACADÉMICO")
 
     pdf.setFillColor(colors.HexColor("#111827"))
     pdf.setFont("Helvetica", 18)
-    pdf.drawCentredString(width / 2, height - 315, "El Instituto Renova certifica que:")
+    pdf.drawCentredString(width / 2, height - 318, "El Instituto Renova certifica que:")
 
     nombre = f"{certificado.estudiante.nombre} {certificado.estudiante.apellido}".upper()
 
+    pdf.setFillColor(colors.HexColor("#0F172A"))
     pdf.setFont("Helvetica-Bold", 31)
     pdf.drawCentredString(width / 2, height - 370, nombre)
 
@@ -360,39 +448,109 @@ def descargar_certificado(id):
     pdf.setFont("Helvetica", 17)
     pdf.drawCentredString(
         width / 2,
-        height - 455,
+        height - 452,
         "cursó y aprobó satisfactoriamente el programa académico:"
     )
 
+    pdf.setFillColor(colors.HexColor("#0B3D2E"))
     pdf.setFont("Helvetica-Bold", 27)
     pdf.drawCentredString(
         width / 2,
-        height - 505,
+        height - 500,
         certificado.curso.nombre.upper()
     )
 
-    pdf.setFont("Helvetica", 15)
+    pdf.setFillColor(colors.HexColor("#111827"))
+    pdf.setFont("Helvetica", 14)
     pdf.drawCentredString(
         width / 2,
-        height - 545,
+        height - 536,
         "cumpliendo con los requisitos académicos establecidos por la institución."
     )
 
     fecha = certificado.fecha_emision.strftime('%d/%m/%Y')
 
-    pdf.setFont("Helvetica", 14)
+    pdf.setFont("Helvetica", 13)
     pdf.drawCentredString(
         width / 2,
-        105,
+        142,
         f"Fecha de expedición: {fecha}"
     )
 
-    pdf.setFillColor(colors.HexColor("#64748B"))
-    pdf.setFont("Helvetica", 11)
+    # Código y enlace
+    pdf.setFillColor(colors.HexColor("#0F172A"))
+    pdf.setFont("Helvetica-Bold", 11)
     pdf.drawCentredString(
         width / 2,
-        75,
-        f"Código de verificación: {certificado.codigo_verificacion}"
+        112,
+        f"Código de verificación: {codigo}"
+    )
+
+    pdf.setFont("Helvetica", 10)
+    pdf.drawCentredString(
+        width / 2,
+        91,
+        "Verifique la autenticidad de este certificado en:"
+    )
+
+    pdf.setFillColor(colors.HexColor("#2563EB"))
+    pdf.setFont("Helvetica", 10)
+    pdf.drawCentredString(
+        width / 2,
+        74,
+        url_verificacion
+    )
+
+    pdf.linkURL(
+        url_verificacion,
+        (width / 2 - 230, 66, width / 2 + 230, 84),
+        relative=0
+    )
+
+    # QR
+    qr_code = qr.QrCodeWidget(url_verificacion)
+    bounds = qr_code.getBounds()
+    qr_width = bounds[2] - bounds[0]
+    qr_height = bounds[3] - bounds[1]
+
+    qr_size = 82
+    drawing = Drawing(
+        qr_size,
+        qr_size,
+        transform=[
+            qr_size / qr_width,
+            0,
+            0,
+            qr_size / qr_height,
+            0,
+            0
+        ]
+    )
+
+    drawing.add(qr_code)
+
+    pdf.setFillColor(colors.HexColor("#0F172A"))
+    pdf.setFont("Helvetica-Bold", 9)
+    pdf.drawCentredString(width - 108, 160, "Verificación QR")
+
+    renderPDF.draw(
+        drawing,
+        pdf,
+        width - 150,
+        72
+    )
+
+    pdf.setFont("Helvetica", 8)
+    pdf.setFillColor(colors.HexColor("#64748B"))
+    pdf.drawCentredString(width - 108, 58, "Escanee para verificar")
+
+    # Nota inferior
+    pdf.setFillColor(colors.HexColor("#64748B"))
+    pdf.setFont("Helvetica", 8)
+    pdf.drawCentredString(
+        width / 2,
+        45,
+        "Este certificado puede ser validado únicamente mediante el sistema oficial de verificación del Instituto Renova."
     )
 
     pdf.save()
@@ -401,7 +559,7 @@ def descargar_certificado(id):
     return send_file(
         buffer,
         as_attachment=True,
-        download_name=f"certificado_{certificado.codigo_verificacion}.pdf",
+        download_name=f"certificado_{codigo}.pdf",
         mimetype='application/pdf'
     )
 
