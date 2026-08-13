@@ -347,12 +347,9 @@ def generar_certificado():
         db.session.add(nuevo_certificado)
         db.session.commit()
 
-        registrado = registrar_certificado_en_verificacion(nuevo_certificado)
+        registrar_certificado_en_verificacion(nuevo_certificado)
 
-        if registrado:
-            flash(f'Certificado generado y registrado para verificación. Código: {codigo}')
-        else:
-            flash(f'Certificado generado. Código: {codigo}. Revise la plataforma de verificación.')
+        flash(f'Certificado generado correctamente. Código: {codigo}')
 
         return redirect(url_for('admin.certificados'))
 
@@ -379,131 +376,123 @@ def descargar_certificado(id):
     base_static = os.path.join(os.getcwd(), 'static')
     logo_path = os.path.join(base_static, 'img', 'logo.png')
 
+    def texto_centrado(texto, y, fuente, tamano, color, ancho_maximo=None, interlineado=None):
+        texto = str(texto or "")
+        pdf.setFillColor(colors.HexColor(color))
+        pdf.setFont(fuente, tamano)
+
+        if not ancho_maximo:
+            pdf.drawCentredString(width / 2, y, texto)
+            return y - (interlineado or tamano + 6)
+
+        palabras = texto.split()
+        lineas = []
+        linea = ""
+
+        for palabra in palabras:
+            prueba = (linea + " " + palabra).strip()
+
+            if pdf.stringWidth(prueba, fuente, tamano) <= ancho_maximo:
+                linea = prueba
+            else:
+                if linea:
+                    lineas.append(linea)
+                linea = palabra
+
+        if linea:
+            lineas.append(linea)
+
+        salto = interlineado or tamano + 7
+
+        for linea in lineas:
+            pdf.drawCentredString(width / 2, y, linea)
+            y -= salto
+
+        return y
+
     # Fondo
     pdf.setFillColor(colors.HexColor("#F8FAFC"))
     pdf.rect(0, 0, width, height, fill=True, stroke=False)
 
-    # Marco exterior
+    # Marcos
     pdf.setStrokeColor(colors.HexColor("#0F172A"))
     pdf.setLineWidth(4)
-    pdf.rect(35, 35, width - 70, height - 70, fill=False)
+    pdf.rect(32, 32, width - 64, height - 64, fill=False)
 
-    # Marco interior dorado
     pdf.setStrokeColor(colors.HexColor("#C9A227"))
     pdf.setLineWidth(2)
-    pdf.rect(52, 52, width - 104, height - 104, fill=False)
+    pdf.rect(50, 50, width - 100, height - 100, fill=False)
 
-    # Línea decorativa superior
     pdf.setFillColor(colors.HexColor("#0B3D2E"))
-    pdf.rect(52, height - 92, width - 104, 8, fill=True, stroke=False)
+    pdf.rect(50, height - 82, width - 100, 7, fill=True, stroke=False)
 
     # Logo
     if os.path.exists(logo_path):
         pdf.drawImage(
             logo_path,
-            width / 2 - 48,
-            height - 155,
-            width=96,
-            height=96,
+            width / 2 - 38,
+            height - 128,
+            width=76,
+            height=76,
             preserveAspectRatio=True,
             mask='auto'
         )
 
     # Encabezado
-    pdf.setFillColor(colors.HexColor("#0F172A"))
-    pdf.setFont("Helvetica-Bold", 30)
-    pdf.drawCentredString(width / 2, height - 185, "INSTITUTO RENOVA")
+    texto_centrado("INSTITUTO RENOVA", height - 158, "Helvetica-Bold", 28, "#0F172A")
+    texto_centrado("Formación para el Trabajo y el Desarrollo Humano", height - 184, "Helvetica", 13, "#0F172A")
 
-    pdf.setFont("Helvetica", 14)
-    pdf.drawCentredString(
-        width / 2,
-        height - 207,
-        "Formación para el Trabajo y el Desarrollo Humano"
-    )
-
-    pdf.setFillColor(colors.HexColor("#0B3D2E"))
-    pdf.setFont("Helvetica-Bold", 35)
-    pdf.drawCentredString(width / 2, height - 265, "CERTIFICADO ACADÉMICO")
-
-    pdf.setFillColor(colors.HexColor("#111827"))
-    pdf.setFont("Helvetica", 18)
-    pdf.drawCentredString(width / 2, height - 318, "El Instituto Renova certifica que:")
+    texto_centrado("CERTIFICADO ACADÉMICO", height - 240, "Helvetica-Bold", 34, "#2563EB")
+    texto_centrado("El Instituto Renova certifica que:", height - 295, "Helvetica", 17, "#111827")
 
     nombre = f"{certificado.estudiante.nombre} {certificado.estudiante.apellido}".upper()
-
-    pdf.setFillColor(colors.HexColor("#0F172A"))
-    pdf.setFont("Helvetica-Bold", 31)
-    pdf.drawCentredString(width / 2, height - 370, nombre)
+    texto_centrado(nombre, height - 345, "Helvetica-Bold", 30, "#0F172A", ancho_maximo=720, interlineado=34)
 
     tipo_documento = certificado.estudiante.tipo_documento or "Documento"
     numero_documento = certificado.estudiante.numero_documento or "________________"
+    texto_centrado(f"{tipo_documento}: {numero_documento}", height - 382, "Helvetica", 14, "#111827")
 
-    pdf.setFont("Helvetica", 15)
-    pdf.drawCentredString(
-        width / 2,
-        height - 402,
-        f"{tipo_documento}: {numero_documento}"
+    texto_centrado(
+        "cursó y aprobó satisfactoriamente el programa académico:",
+        height - 425,
+        "Helvetica",
+        15,
+        "#111827"
     )
 
-    pdf.setFont("Helvetica", 17)
-    pdf.drawCentredString(
-        width / 2,
-        height - 452,
-        "cursó y aprobó satisfactoriamente el programa académico:"
+    texto_centrado(
+        certificado.curso.nombre.upper(),
+        height - 465,
+        "Helvetica-Bold",
+        25,
+        "#0B3D2E",
+        ancho_maximo=700,
+        interlineado=29
     )
 
-    pdf.setFillColor(colors.HexColor("#0B3D2E"))
-    pdf.setFont("Helvetica-Bold", 27)
-    pdf.drawCentredString(
-        width / 2,
-        height - 500,
-        certificado.curso.nombre.upper()
-    )
-
-    pdf.setFillColor(colors.HexColor("#111827"))
-    pdf.setFont("Helvetica", 14)
-    pdf.drawCentredString(
-        width / 2,
-        height - 536,
-        "cumpliendo con los requisitos académicos establecidos por la institución."
+    texto_centrado(
+        "cumpliendo con los requisitos académicos establecidos por la institución.",
+        108,
+        "Helvetica",
+        12,
+        "#111827",
+        ancho_maximo=620,
+        interlineado=15
     )
 
     fecha = certificado.fecha_emision.strftime('%d/%m/%Y')
 
-    pdf.setFont("Helvetica", 13)
-    pdf.drawCentredString(
-        width / 2,
-        142,
-        f"Fecha de expedición: {fecha}"
-    )
-
-    # Código y enlace
-    pdf.setFillColor(colors.HexColor("#0F172A"))
-    pdf.setFont("Helvetica-Bold", 11)
-    pdf.drawCentredString(
-        width / 2,
-        112,
-        f"Código de verificación: {codigo}"
-    )
-
-    pdf.setFont("Helvetica", 10)
-    pdf.drawCentredString(
-        width / 2,
-        91,
-        "Verifique la autenticidad de este certificado en:"
-    )
+    texto_centrado(f"Fecha de expedición: {fecha}", 87, "Helvetica", 11, "#111827")
+    texto_centrado(f"Código de verificación: {codigo}", 68, "Helvetica-Bold", 10, "#0F172A")
+    texto_centrado("Verifique la autenticidad de este certificado en línea:", 52, "Helvetica", 9, "#64748B")
 
     pdf.setFillColor(colors.HexColor("#2563EB"))
-    pdf.setFont("Helvetica", 10)
-    pdf.drawCentredString(
-        width / 2,
-        74,
-        url_verificacion
-    )
+    pdf.setFont("Helvetica", 8)
+    pdf.drawCentredString(width / 2, 39, url_verificacion)
 
     pdf.linkURL(
         url_verificacion,
-        (width / 2 - 230, 66, width / 2 + 230, 84),
+        (width / 2 - 220, 34, width / 2 + 220, 48),
         relative=0
     )
 
@@ -513,7 +502,7 @@ def descargar_certificado(id):
     qr_width = bounds[2] - bounds[0]
     qr_height = bounds[3] - bounds[1]
 
-    qr_size = 82
+    qr_size = 78
     drawing = Drawing(
         qr_size,
         qr_size,
@@ -530,28 +519,19 @@ def descargar_certificado(id):
     drawing.add(qr_code)
 
     pdf.setFillColor(colors.HexColor("#0F172A"))
-    pdf.setFont("Helvetica-Bold", 9)
-    pdf.drawCentredString(width - 108, 160, "Verificación QR")
+    pdf.setFont("Helvetica-Bold", 8)
+    pdf.drawCentredString(width - 105, 130, "Verificación QR")
 
     renderPDF.draw(
         drawing,
         pdf,
-        width - 150,
-        72
+        width - 144,
+        47
     )
 
-    pdf.setFont("Helvetica", 8)
     pdf.setFillColor(colors.HexColor("#64748B"))
-    pdf.drawCentredString(width - 108, 58, "Escanee para verificar")
-
-    # Nota inferior
-    pdf.setFillColor(colors.HexColor("#64748B"))
-    pdf.setFont("Helvetica", 8)
-    pdf.drawCentredString(
-        width / 2,
-        45,
-        "Este certificado puede ser validado únicamente mediante el sistema oficial de verificación del Instituto Renova."
-    )
+    pdf.setFont("Helvetica", 7)
+    pdf.drawCentredString(width - 105, 36, "Escanee para verificar")
 
     pdf.save()
     buffer.seek(0)
