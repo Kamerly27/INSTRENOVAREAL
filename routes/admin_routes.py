@@ -667,3 +667,37 @@ def enviar_mensaje():
 def crear_tablas_seguimiento():
     db.create_all()
     return 'TABLAS CREADAS CORRECTAMENTE'
+
+
+@admin.route('/sincronizar-certificados-verificacion')
+def sincronizar_certificados_verificacion():
+
+    certificados = Certificado.query.order_by(Certificado.id.desc()).all()
+
+    total = 0
+    enviados = 0
+    errores = 0
+
+    for certificado in certificados:
+        total += 1
+
+        try:
+            registrado = registrar_certificado_en_verificacion(certificado)
+
+            if registrado:
+                enviados += 1
+            else:
+                errores += 1
+
+        except Exception as error:
+            print("Error sincronizando certificado:", error)
+            errores += 1
+
+    return f"""
+    <h2>Sincronización de certificados</h2>
+    <p>Total certificados en campus: {total}</p>
+    <p>Enviados correctamente a verificación: {enviados}</p>
+    <p>Con error: {errores}</p>
+    <br>
+    <a href='/admin/certificados'>Volver a certificados</a>
+    """
