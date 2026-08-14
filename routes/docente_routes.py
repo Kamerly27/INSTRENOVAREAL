@@ -399,7 +399,61 @@ def examenes(modulo_id):
 @login_required
 def crear_examen(modulo_id):
 
-    return redirect(url_for('docente.crear_examen_linea', modulo_id=modulo_id))
+
+    modulo = Modulo.query.get_or_404(modulo_id)
+    curso = Curso.query.get(modulo.curso_id)
+
+    if request.method == 'POST':
+        titulo = request.form.get('titulo', '').strip()
+        descripcion = request.form.get('descripcion', '').strip()
+
+        fecha_inicio = None
+        fecha_fin = None
+
+        try:
+            valor_inicio = request.form.get('fecha_inicio')
+            if valor_inicio:
+                fecha_inicio = datetime.strptime(valor_inicio, "%Y-%m-%d")
+        except Exception:
+            fecha_inicio = None
+
+        try:
+            valor_fin = request.form.get('fecha_fin')
+            if valor_fin:
+                fecha_fin = datetime.strptime(valor_fin, "%Y-%m-%d")
+        except Exception:
+            fecha_fin = None
+
+        if not titulo:
+            flash("Debe escribir el título del examen.", "warning")
+            return render_template(
+                'docente/crear_examen_linea.html',
+                modulo=modulo,
+                curso=curso
+            )
+
+        examen = Examen(
+            titulo=titulo,
+            descripcion=descripcion,
+            enlace='',
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            activo=True,
+            modulo_id=modulo.id
+        )
+
+        db.session.add(examen)
+        db.session.commit()
+
+        flash("Examen creado correctamente. Ahora agregue las preguntas.", "success")
+        return redirect(url_for('docente.preguntas_examen_linea', examen_id=examen.id))
+
+    return render_template(
+        'docente/crear_examen_linea.html',
+        modulo=modulo,
+        curso=curso
+    )
+
 
 
 @docente.route('/examen/<int:id>/editar', methods=['GET', 'POST'])
