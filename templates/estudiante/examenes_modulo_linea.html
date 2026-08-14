@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Exámenes del módulo</title>
+    <style>
+        body { font-family: Arial, sans-serif; background:#eef3f7; margin:0; color:#102a23; }
+        .wrap { max-width:1150px; margin:35px auto; background:white; padding:30px; border-radius:22px; box-shadow:0 10px 30px rgba(0,0,0,.08); }
+        h1 { color:#064A33; margin-bottom:5px; font-size:36px; }
+        .sub { color:#4b5563; margin-top:0; }
+        table { width:100%; border-collapse:collapse; margin-top:25px; }
+        th, td { padding:14px; border-bottom:1px solid #e5e7eb; text-align:left; vertical-align:top; }
+        th { background:#f8fafc; color:#1f2937; }
+        .titulo { font-weight:bold; color:#064A33; max-width:230px; }
+        .desc { max-width:360px; line-height:1.4; }
+        .estado { font-weight:bold; color:#064A33; }
+        .btn { display:inline-block; padding:11px 15px; border-radius:10px; text-decoration:none; font-weight:bold; font-size:14px; }
+        .btn-green { background:#064A33; color:white; }
+        .btn-light { background:#e8f5ef; color:#064A33; }
+        .btn-blue { background:#2563eb; color:white; }
+        .empty { background:#f8fafc; padding:22px; border-radius:14px; margin-top:20px; color:#6b7280; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Exámenes del módulo</h1>
+
+    <p class="sub">
+        <strong>Curso:</strong> {{ curso.nombre if curso else 'Curso' }}<br>
+        <strong>Módulo:</strong> {{ modulo.titulo if modulo.titulo else modulo.nombre }}
+    </p>
+
+    <p>
+        <a class="btn btn-light" href="/estudiante/dashboard">Volver al panel estudiante</a>
+    </p>
+
+    {% if examenes %}
+        <table>
+            <tr>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Estado</th>
+                <th>Preguntas</th>
+                <th>Acción</th>
+            </tr>
+
+            {% for examen in examenes %}
+            <tr>
+                <td class="titulo">{{ examen.titulo }}</td>
+                <td class="desc">{{ examen.descripcion or 'Sin descripción.' }}</td>
+                <td>{{ examen.fecha_inicio.strftime('%d/%m/%Y') if examen.fecha_inicio else 'Sin definir' }}</td>
+                <td>{{ examen.fecha_fin.strftime('%d/%m/%Y') if examen.fecha_fin else 'Sin definir' }}</td>
+                <td class="estado">{{ 'Activo' if examen.activo else 'Inactivo' }}</td>
+                <td>{{ conteo_preguntas[examen.id] }}</td>
+                <td>
+                    {% if intentos[examen.id] %}
+                        <a class="btn btn-blue" href="{{ url_for('estudiante.resultado_examen_linea', intento_id=intentos[examen.id].id) }}">
+                            Ver resultado
+                        </a>
+                    {% else %}
+                        <a class="btn btn-green" href="{{ url_for('estudiante.presentar_examen_linea', examen_id=examen.id) }}">
+                            Presentar examen
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <div class="empty">
+            Este módulo todavía no tiene exámenes disponibles.
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>

@@ -129,14 +129,45 @@ def actividades(modulo_id):
 @login_required
 def examenes(modulo_id):
 
+
+    modulo = Modulo.query.get_or_404(modulo_id)
+    curso = Curso.query.get(modulo.curso_id)
+
     examenes = Examen.query.filter_by(
-        modulo_id=modulo_id
-    ).all()
+        modulo_id=modulo.id,
+        activo=True
+    ).order_by(Examen.id.desc()).all()
+
+    estudiante_id = None
+
+    for clave in ['usuario_id', 'user_id', 'id_usuario', 'id', 'estudiante_id']:
+        if session.get(clave):
+            estudiante_id = session.get(clave)
+            break
+
+    conteo_preguntas = {}
+    intentos = {}
+
+    for examen in examenes:
+        conteo_preguntas[examen.id] = PreguntaExamen.query.filter_by(examen_id=examen.id).count()
+
+        if estudiante_id:
+            intentos[examen.id] = IntentoExamen.query.filter_by(
+                examen_id=examen.id,
+                estudiante_id=estudiante_id
+            ).order_by(IntentoExamen.id.desc()).first()
+        else:
+            intentos[examen.id] = None
 
     return render_template(
-        'estudiante/examenes.html',
-        examenes=examenes
+        'estudiante/examenes_modulo_linea.html',
+        modulo=modulo,
+        curso=curso,
+        examenes=examenes,
+        conteo_preguntas=conteo_preguntas,
+        intentos=intentos
     )
+
 
 
 @estudiante.route('/calificaciones')
