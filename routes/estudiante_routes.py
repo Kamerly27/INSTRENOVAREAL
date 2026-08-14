@@ -318,7 +318,28 @@ from models.respuesta_examen import RespuestaExamen
 
 
 def _estudiante_id_examenes():
-    return session.get('usuario_id') or session.get('user_id') or session.get('id_usuario')
+    posibles = [
+        'usuario_id',
+        'user_id',
+        'id_usuario',
+        'id',
+        'estudiante_id',
+        'usuario'
+    ]
+
+    for clave in posibles:
+        valor = session.get(clave)
+
+        if isinstance(valor, dict):
+            for subclave in ['id', 'usuario_id', 'user_id', 'id_usuario']:
+                if valor.get(subclave):
+                    return valor.get(subclave)
+
+        if valor:
+            return valor
+
+    return None
+
 
 
 def _estudiante_matriculado_en_examen(examen, estudiante_id):

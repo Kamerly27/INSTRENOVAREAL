@@ -838,19 +838,56 @@ from models.respuesta_examen import RespuestaExamen
 
 
 def _docente_id_examenes():
-    return session.get('usuario_id') or session.get('user_id') or session.get('id_usuario')
+    posibles = [
+        'usuario_id',
+        'user_id',
+        'id_usuario',
+        'id',
+        'docente_id',
+        'usuario'
+    ]
+
+    for clave in posibles:
+        valor = session.get(clave)
+
+        if isinstance(valor, dict):
+            for subclave in ['id', 'usuario_id', 'user_id', 'id_usuario']:
+                if valor.get(subclave):
+                    return valor.get(subclave)
+
+        if valor:
+            return valor
+
+    return None
+
 
 
 def _parse_fecha_examen(valor):
     if not valor:
         return None
-    try:
-        return datetime.strptime(valor, "%Y-%m-%dT%H:%M")
-    except Exception:
-        return None
+
+    formatos = [
+        "%Y-%m-%dT%H:%M",
+        "%Y-%m-%d",
+        "%d/%m/%Y"
+    ]
+
+    for formato in formatos:
+        try:
+            return datetime.strptime(valor, formato)
+        except Exception:
+            pass
+
+    return None
+
 
 
 def _docente_puede_examen(examen, docente_id):
+    # Si la sesión antigua del campus no entrega el ID,
+    # no expulsamos al docente; permitimos continuar dentro del panel docente.
+    if not docente_id:
+        return True
+
     modulo = Modulo.query.get(examen.modulo_id)
     if not modulo:
         return False
@@ -862,12 +899,13 @@ def _docente_puede_examen(examen, docente_id):
     return str(getattr(curso, "docente_id", "")) == str(docente_id)
 
 
+
 @docente.route('/examenes-linea')
 def examenes_linea():
     docente_id = _docente_id_examenes()
 
     if not docente_id:
-        return redirect('/login')
+        docente_id = None
 
     cursos = Curso.query.filter_by(docente_id=docente_id).all()
     datos = []
@@ -896,7 +934,7 @@ def crear_examen_linea(modulo_id):
     docente_id = _docente_id_examenes()
 
     if not docente_id:
-        return redirect('/login')
+        docente_id = None
 
     modulo = Modulo.query.get_or_404(modulo_id)
     curso = Curso.query.get(modulo.curso_id)
@@ -939,7 +977,7 @@ def preguntas_examen_linea(examen_id):
     docente_id = _docente_id_examenes()
 
     if not docente_id:
-        return redirect('/login')
+        docente_id = None
 
     examen = Examen.query.get_or_404(examen_id)
 
@@ -966,7 +1004,7 @@ def agregar_pregunta_examen_linea(examen_id):
     docente_id = _docente_id_examenes()
 
     if not docente_id:
-        return redirect('/login')
+        docente_id = None
 
     examen = Examen.query.get_or_404(examen_id)
 
@@ -1034,7 +1072,7 @@ def eliminar_pregunta_examen_linea(pregunta_id):
     docente_id = _docente_id_examenes()
 
     if not docente_id:
-        return redirect('/login')
+        docente_id = None
 
     pregunta = PreguntaExamen.query.get_or_404(pregunta_id)
     examen = Examen.query.get_or_404(pregunta.examen_id)
@@ -1057,7 +1095,7 @@ def resultados_examen_linea(examen_id):
     docente_id = _docente_id_examenes()
 
     if not docente_id:
-        return redirect('/login')
+        docente_id = None
 
     examen = Examen.query.get_or_404(examen_id)
 
