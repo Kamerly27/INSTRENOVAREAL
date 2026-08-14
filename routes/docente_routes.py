@@ -399,41 +399,7 @@ def examenes(modulo_id):
 @login_required
 def crear_examen(modulo_id):
 
-    modulo = Modulo.query.get_or_404(modulo_id)
-
-    if request.method == 'POST':
-
-        fecha_inicio_texto = request.form.get('fecha_inicio')
-        fecha_fin_texto = request.form.get('fecha_fin')
-
-        fecha_inicio = None
-        fecha_fin = None
-
-        if fecha_inicio_texto:
-            fecha_inicio = datetime.strptime(fecha_inicio_texto, '%Y-%m-%d')
-
-        if fecha_fin_texto:
-            fecha_fin = datetime.strptime(fecha_fin_texto, '%Y-%m-%d')
-
-        nuevo_examen = Examen(
-            titulo=request.form.get('titulo'),
-            descripcion=request.form.get('descripcion'),
-            enlace=request.form.get('enlace'),
-            fecha_inicio=fecha_inicio,
-            fecha_fin=fecha_fin,
-            activo=True if request.form.get('activo') == '1' else False,
-            modulo_id=modulo_id
-        )
-
-        db.session.add(nuevo_examen)
-        db.session.commit()
-
-        return redirect(url_for('docente.examenes', modulo_id=modulo_id))
-
-    return render_template(
-        'docente/crear_examen.html',
-        modulo=modulo
-    )
+    return redirect(url_for('docente.crear_examen_linea', modulo_id=modulo_id))
 
 
 @docente.route('/examen/<int:id>/editar', methods=['GET', 'POST'])
