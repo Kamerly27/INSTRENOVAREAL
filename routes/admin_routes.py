@@ -33,6 +33,11 @@ from models.foro import Foro
 from models.comentario_foro import ComentarioForo
 from models.ingreso_curso import IngresoCurso
 from models.entrega_actividad import EntregaActividad
+from models.pregunta_examen import PreguntaExamen
+from models.opcion_pregunta import OpcionPregunta
+from models.intento_examen import IntentoExamen
+from models.respuesta_examen import RespuestaExamen
+
 
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')

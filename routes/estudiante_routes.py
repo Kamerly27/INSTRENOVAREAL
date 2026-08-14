@@ -302,3 +302,239 @@ def entregar_actividad(actividad_id):
     db.session.commit()
 
     return redirect(url_for('estudiante.actividades', modulo_id=actividad.modulo_id))
+
+# ===== EXÁMENES EN LÍNEA ESTUDIANTE RENOVA =====
+from datetime import datetime
+from flask import render_template, request, redirect, url_for, flash, session
+from database.db import db
+from models.curso import Curso
+from models.modulo import Modulo
+from models.matricula import Matricula
+from models.examen import Examen
+from models.pregunta_examen import PreguntaExamen
+from models.opcion_pregunta import OpcionPregunta
+from models.intento_examen import IntentoExamen
+from models.respuesta_examen import RespuestaExamen
+
+
+def _estudiante_id_examenes():
+    return session.get('usuario_id') or session.get('user_id') or session.get('id_usuario')
+
+
+def _estudiante_matriculado_en_examen(examen, estudiante_id):
+    modulo = Modulo.query.get(examen.modulo_id)
+    if not modulo:
+        return False
+
+    matricula = Matricula.query.filter_by(
+        estudiante_id=estudiante_id,
+        curso_id=modulo.curso_id
+    ).first()
+
+    return matricula is not None
+
+
+def _estado_disponibilidad_examen(examen):
+    ahora = datetime.utcnow()
+
+    if not examen.activo:
+        return False, "No disponible"
+
+    if examen.fecha_inicio and ahora < examen.fecha_inicio:
+        return False, "Aún no está disponible"
+
+    if examen.fecha_fin and ahora > examen.fecha_fin:
+        return False, "Fecha vencida"
+
+    return True, "Disponible"
+
+
+@estudiante.route('/examenes-linea')
+def examenes_linea_estudiante():
+    estudiante_id = _estudiante_id_examenes()
+
+    if not estudiante_id:
+        return redirect('/login')
+
+    matriculas = Matricula.query.filter_by(estudiante_id=estudiante_id).all()
+    datos = []
+
+    for matricula in matriculas:
+        curso = Curso.query.get(matricula.curso_id)
+        if not curso:
+            continue
+
+        modulos = Modulo.query.filter_by(curso_id=curso.id).all()
+
+        for modulo in modulos:
+            examenes = Examen.query.filter_by(modulo_id=modulo.id, activo=True).order_by(Examen.id.desc()).all()
+
+            for examen in examenes:
+                intento = IntentoExamen.query.filter_by(
+                    examen_id=examen.id,
+                    estudiante_id=estudiante_id
+                ).order_by(IntentoExamen.id.desc()).first()
+
+                disponible, mensaje = _estado_disponibilidad_examen(examen)
+
+                datos.append({
+                    "curso": curso,
+                    "modulo": modulo,
+                    "examen": examen,
+                    "intento": intento,
+                    "disponible": disponible,
+                    "mensaje": mensaje
+                })
+
+    return render_template('estudiante/examenes_linea.html', datos=datos)
+
+
+@estudiante.route('/examenes/<int:examen_id>/presentar', methods=['GET', 'POST'])
+def presentar_examen_linea(examen_id):
+    estudiante_id = _estudiante_id_examenes()
+
+    if not estudiante_id:
+        return redirect('/login')
+
+    examen = Examen.query.get_or_404(examen_id)
+
+    if not _estudiante_matriculado_en_examen(examen, estudiante_id):
+        flash("No tiene matrícula activa para presentar este examen.", "danger")
+        return redirect('/estudiante/examenes-linea')
+
+    disponible, mensaje = _estado_disponibilidad_examen(examen)
+    if not disponible:
+        flash(mensaje, "warning")
+        return redirect('/estudiante/examenes-linea')
+
+    intento_anterior = IntentoExamen.query.filter_by(
+        examen_id=examen.id,
+        estudiante_id=estudiante_id
+    ).order_by(IntentoExamen.id.desc()).first()
+
+    if intento_anterior:
+        flash("Este examen ya fue presentado.", "info")
+        return redirect(url_for('estudiante.resultado_examen_linea', intento_id=intento_anterior.id))
+
+    preguntas = PreguntaExamen.query.filter_by(
+        examen_id=examen.id,
+        activo=True
+    ).order_by(PreguntaExamen.orden.asc(), PreguntaExamen.id.asc()).all()
+
+    if not preguntas:
+        flash("Este examen todavía no tiene preguntas.", "warning")
+        return redirect('/estudiante/examenes-linea')
+
+    opciones_por_pregunta = {}
+    for pregunta in preguntas:
+        opciones_por_pregunta[pregunta.id] = OpcionPregunta.query.filter_by(
+            pregunta_id=pregunta.id
+        ).order_by(OpcionPregunta.orden.asc()).all()
+
+    if request.method == 'POST':
+        for pregunta in preguntas:
+            if not request.form.get(f'pregunta_{pregunta.id}'):
+                flash("Debe responder todas las preguntas antes de enviar.", "warning")
+                return redirect(url_for('estudiante.presentar_examen_linea', examen_id=examen.id))
+
+        intento = IntentoExamen(
+            examen_id=examen.id,
+            estudiante_id=estudiante_id,
+            fecha_inicio=datetime.utcnow(),
+            fecha_fin=datetime.utcnow(),
+            estado='Finalizado',
+            ip=request.remote_addr
+        )
+
+        db.session.add(intento)
+        db.session.flush()
+
+        puntaje_total = 0
+        puntaje_obtenido = 0
+
+        for pregunta in preguntas:
+            puntaje_total += pregunta.puntos or 0
+
+            opcion_id = int(request.form.get(f'pregunta_{pregunta.id}'))
+            opcion = OpcionPregunta.query.filter_by(
+                id=opcion_id,
+                pregunta_id=pregunta.id
+            ).first()
+
+            es_correcta = bool(opcion and opcion.correcta)
+            puntos = pregunta.puntos if es_correcta else 0
+            puntaje_obtenido += puntos
+
+            respuesta = RespuestaExamen(
+                intento_id=intento.id,
+                pregunta_id=pregunta.id,
+                opcion_id=opcion.id if opcion else None,
+                respuesta_texto=opcion.texto if opcion else '',
+                es_correcta=es_correcta,
+                puntos_obtenidos=puntos
+            )
+
+            db.session.add(respuesta)
+
+        nota = round((puntaje_obtenido / puntaje_total) * 5, 2) if puntaje_total > 0 else 0
+
+        intento.puntaje_total = puntaje_total
+        intento.puntaje_obtenido = puntaje_obtenido
+        intento.nota = nota
+
+        db.session.commit()
+
+        flash("Examen enviado correctamente.", "success")
+        return redirect(url_for('estudiante.resultado_examen_linea', intento_id=intento.id))
+
+    return render_template(
+        'estudiante/presentar_examen.html',
+        examen=examen,
+        preguntas=preguntas,
+        opciones_por_pregunta=opciones_por_pregunta
+    )
+
+
+@estudiante.route('/examenes/resultado/<int:intento_id>')
+def resultado_examen_linea(intento_id):
+    estudiante_id = _estudiante_id_examenes()
+
+    if not estudiante_id:
+        return redirect('/login')
+
+    intento = IntentoExamen.query.get_or_404(intento_id)
+
+    if str(intento.estudiante_id) != str(estudiante_id):
+        flash("No tiene permiso para ver este resultado.", "danger")
+        return redirect('/estudiante/examenes-linea')
+
+    examen = Examen.query.get_or_404(intento.examen_id)
+    respuestas = RespuestaExamen.query.filter_by(intento_id=intento.id).all()
+
+    preguntas = {}
+    opciones = {}
+    correctas = {}
+
+    for respuesta in respuestas:
+        pregunta = PreguntaExamen.query.get(respuesta.pregunta_id)
+        preguntas[respuesta.pregunta_id] = pregunta
+
+        if respuesta.opcion_id:
+            opciones[respuesta.opcion_id] = OpcionPregunta.query.get(respuesta.opcion_id)
+
+        correcta = OpcionPregunta.query.filter_by(
+            pregunta_id=respuesta.pregunta_id,
+            correcta=True
+        ).first()
+
+        correctas[respuesta.pregunta_id] = correcta
+
+    return render_template(
+        'estudiante/resultado_examen.html',
+        examen=examen,
+        intento=intento,
+        respuestas=respuestas,
+        preguntas=preguntas,
+        opciones=opciones,
+        correctas=correctas
+    )

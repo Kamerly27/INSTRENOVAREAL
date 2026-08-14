@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear examen</title>
+    <style>
+        body { font-family:Arial, sans-serif; background:#f3f6f9; margin:0; color:#102a23; }
+        .wrap { max-width:800px; margin:35px auto; background:white; padding:30px; border-radius:18px; box-shadow:0 8px 25px rgba(0,0,0,.08); }
+        h1 { color:#064A33; }
+        label { display:block; margin-top:15px; font-weight:bold; }
+        input, textarea { width:100%; padding:12px; border:1px solid #d1d5db; border-radius:10px; margin-top:6px; }
+        textarea { min-height:120px; }
+        .btn { display:inline-block; border:0; padding:12px 18px; border-radius:10px; font-weight:bold; text-decoration:none; cursor:pointer; margin-top:18px; }
+        .btn-green { background:#064A33; color:white; }
+        .btn-light { background:#e8f5ef; color:#064A33; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Crear examen en línea</h1>
+    <p><strong>Curso:</strong> {{ curso.nombre }}</p>
+    <p><strong>Módulo:</strong> {{ modulo.titulo if modulo.titulo else modulo.nombre }}</p>
+
+    <form method="POST">
+        <label>Título del examen</label>
+        <input type="text" name="titulo" required>
+
+        <label>Descripción o instrucciones</label>
+        <textarea name="descripcion"></textarea>
+
+        <label>Fecha y hora de inicio</label>
+        <input type="datetime-local" name="fecha_inicio">
+
+        <label>Fecha y hora de cierre</label>
+        <input type="datetime-local" name="fecha_fin">
+
+        <button class="btn btn-green" type="submit">Crear examen</button>
+        <a class="btn btn-light" href="/docente/examenes-linea">Volver</a>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis exámenes en línea</title>
+    <style>
+        body { font-family:Arial, sans-serif; background:#f3f6f9; margin:0; color:#102a23; }
+        .wrap { max-width:1000px; margin:30px auto; padding:20px; }
+        .top { background:#064A33; color:white; padding:25px; border-radius:18px; }
+        .card { background:white; margin-top:18px; padding:22px; border-radius:16px; box-shadow:0 8px 25px rgba(0,0,0,.08); }
+        .btn { display:inline-block; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:bold; margin-top:8px; }
+        .btn-green { background:#064A33; color:white; }
+        .btn-light { background:#e8f5ef; color:#064A33; }
+        .estado { font-weight:bold; color:#C79A22; }
+        .nota { color:#064A33; font-weight:bold; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <h1>Mis exámenes en línea</h1>
+        <p>Presente sus evaluaciones directamente dentro del campus.</p>
+    </div>
+
+    <p>
+        <a class="btn btn-light" href="/estudiante/dashboard">Volver al panel estudiante</a>
+    </p>
+
+    {% for item in datos %}
+        <div class="card">
+            <h2>{{ item.examen.titulo }}</h2>
+            <p><strong>Curso:</strong> {{ item.curso.nombre }}</p>
+            <p><strong>Módulo:</strong> {{ item.modulo.titulo if item.modulo.titulo else item.modulo.nombre }}</p>
+            <p>{{ item.examen.descripcion }}</p>
+
+            {% if item.examen.fecha_inicio %}
+                <p><strong>Inicio:</strong> {{ item.examen.fecha_inicio.strftime('%d/%m/%Y %H:%M') }}</p>
+            {% endif %}
+
+            {% if item.examen.fecha_fin %}
+                <p><strong>Cierre:</strong> {{ item.examen.fecha_fin.strftime('%d/%m/%Y %H:%M') }}</p>
+            {% endif %}
+
+            {% if item.intento %}
+                <p class="nota">Ya presentado. Nota: {{ item.intento.nota }}</p>
+                <a class="btn btn-light" href="{{ url_for('estudiante.resultado_examen_linea', intento_id=item.intento.id) }}">Ver resultado</a>
+            {% elif item.disponible %}
+                <a class="btn btn-green" href="{{ url_for('estudiante.presentar_examen_linea', examen_id=item.examen.id) }}">Presentar examen</a>
+            {% else %}
+                <p class="estado">{{ item.mensaje }}</p>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="card">
+            <p>No tiene exámenes disponibles.</p>
+        </div>
+    {% endfor %}
+</div>
+</body>
+</html>

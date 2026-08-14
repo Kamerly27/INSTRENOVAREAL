@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados del examen</title>
+    <style>
+        body { font-family:Arial, sans-serif; background:#f3f6f9; margin:0; color:#102a23; }
+        .wrap { max-width:1000px; margin:30px auto; background:white; padding:28px; border-radius:18px; box-shadow:0 8px 25px rgba(0,0,0,.08); }
+        h1 { color:#064A33; }
+        table { width:100%; border-collapse:collapse; margin-top:18px; }
+        th, td { padding:12px; border-bottom:1px solid #e5e7eb; text-align:left; }
+        th { background:#f8fafc; }
+        .nota { font-weight:bold; color:#064A33; }
+        .btn { display:inline-block; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:bold; background:#e8f5ef; color:#064A33; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Resultados: {{ examen.titulo }}</h1>
+
+    <a class="btn" href="{{ url_for('docente.preguntas_examen_linea', examen_id=examen.id) }}">Volver al examen</a>
+
+    {% if intentos %}
+        <table>
+            <tr>
+                <th>Estudiante</th>
+                <th>Nota</th>
+                <th>Puntaje</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+            </tr>
+            {% for intento in intentos %}
+            <tr>
+                <td>
+                    {% set est = estudiantes[intento.estudiante_id] %}
+                    {{ est.nombre if est else 'Estudiante' }} {{ est.apellido if est else '' }}
+                </td>
+                <td class="nota">{{ intento.nota }}</td>
+                <td>{{ intento.puntaje_obtenido }} / {{ intento.puntaje_total }}</td>
+                <td>{{ intento.fecha_fin.strftime('%d/%m/%Y %H:%M') if intento.fecha_fin else '' }}</td>
+                <td>{{ intento.estado }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Todavía ningún estudiante ha presentado este examen.</p>
+    {% endif %}
+</div>
+</body>
+</html>

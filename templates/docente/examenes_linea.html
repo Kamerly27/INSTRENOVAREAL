@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Exámenes en línea</title>
+    <style>
+        body { font-family: Arial, sans-serif; background:#f3f6f9; margin:0; color:#102a23; }
+        .wrap { max-width:1100px; margin:30px auto; padding:20px; }
+        .top { background:#064A33; color:white; padding:25px; border-radius:18px; }
+        .top h1 { margin:0; }
+        .card { background:white; margin-top:20px; padding:22px; border-radius:16px; box-shadow:0 8px 25px rgba(0,0,0,.08); }
+        .modulo { border:1px solid #dbe5df; padding:18px; border-radius:14px; margin-top:15px; }
+        .btn { display:inline-block; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:bold; margin:4px; }
+        .btn-green { background:#064A33; color:white; }
+        .btn-gold { background:#C79A22; color:white; }
+        .btn-light { background:#e8f5ef; color:#064A33; }
+        table { width:100%; border-collapse:collapse; margin-top:12px; }
+        th, td { padding:10px; border-bottom:1px solid #e5e7eb; text-align:left; font-size:14px; }
+        th { background:#f8fafc; }
+        .empty { color:#6b7280; font-style:italic; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <h1>Exámenes en línea</h1>
+        <p>Cree exámenes internos sin usar enlaces externos.</p>
+    </div>
+
+    <p>
+        <a class="btn btn-light" href="/docente/dashboard">Volver al panel docente</a>
+    </p>
+
+    {% for bloque in datos %}
+        <div class="card">
+            <h2>{{ bloque.curso.nombre }}</h2>
+
+            {% for item in bloque.modulos %}
+                <div class="modulo">
+                    <h3>Módulo: {{ item.modulo.titulo if item.modulo.titulo else item.modulo.nombre }}</h3>
+
+                    <a class="btn btn-green" href="{{ url_for('docente.crear_examen_linea', modulo_id=item.modulo.id) }}">
+                        Crear examen en este módulo
+                    </a>
+
+                    {% if item.examenes %}
+                        <table>
+                            <tr>
+                                <th>Examen</th>
+                                <th>Inicio</th>
+                                <th>Fin</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                            {% for examen in item.examenes %}
+                            <tr>
+                                <td>{{ examen.titulo }}</td>
+                                <td>{{ examen.fecha_inicio.strftime('%d/%m/%Y %H:%M') if examen.fecha_inicio else 'Sin fecha' }}</td>
+                                <td>{{ examen.fecha_fin.strftime('%d/%m/%Y %H:%M') if examen.fecha_fin else 'Sin fecha' }}</td>
+                                <td>{{ 'Activo' if examen.activo else 'Inactivo' }}</td>
+                                <td>
+                                    <a class="btn btn-gold" href="{{ url_for('docente.preguntas_examen_linea', examen_id=examen.id) }}">Preguntas</a>
+                                    <a class="btn btn-light" href="{{ url_for('docente.resultados_examen_linea', examen_id=examen.id) }}">Resultados</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <p class="empty">Este módulo todavía no tiene exámenes.</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card">
+            <p>No tiene cursos asignados.</p>
+        </div>
+    {% endfor %}
+</div>
+</body>
+</html>

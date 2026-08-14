@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado del examen</title>
+    <style>
+        body { font-family:Arial, sans-serif; background:#f3f6f9; margin:0; color:#102a23; }
+        .wrap { max-width:900px; margin:30px auto; padding:20px; }
+        .top, .card { background:white; padding:24px; border-radius:18px; box-shadow:0 8px 25px rgba(0,0,0,.08); margin-bottom:20px; }
+        h1 { color:#064A33; }
+        .nota { font-size:32px; color:#064A33; font-weight:bold; }
+        .ok { color:#047857; font-weight:bold; }
+        .bad { color:#b91c1c; font-weight:bold; }
+        .btn { display:inline-block; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:bold; background:#e8f5ef; color:#064A33; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <h1>Resultado del examen</h1>
+        <h2>{{ examen.titulo }}</h2>
+        <p class="nota">{{ intento.nota }}</p>
+        <p>Puntaje: {{ intento.puntaje_obtenido }} / {{ intento.puntaje_total }}</p>
+        <a class="btn" href="/estudiante/examenes-linea">Volver a mis exámenes</a>
+    </div>
+
+    {% for respuesta in respuestas %}
+        {% set pregunta = preguntas[respuesta.pregunta_id] %}
+        <div class="card">
+            <h3>{{ loop.index }}. {{ pregunta.enunciado if pregunta else 'Pregunta' }}</h3>
+
+            <p>
+                <strong>Su respuesta:</strong>
+                {% if respuesta.opcion_id and opciones[respuesta.opcion_id] %}
+                    {{ opciones[respuesta.opcion_id].texto }}
+                {% else %}
+                    Sin respuesta
+                {% endif %}
+            </p>
+
+            {% if respuesta.es_correcta %}
+                <p class="ok">Correcta ✅</p>
+            {% else %}
+                <p class="bad">Incorrecta ❌</p>
+                {% if correctas[respuesta.pregunta_id] %}
+                    <p><strong>Respuesta correcta:</strong> {{ correctas[respuesta.pregunta_id].texto }}</p>
+                {% endif %}
+            {% endif %}
+
+            <p><strong>Puntos obtenidos:</strong> {{ respuesta.puntos_obtenidos }}</p>
+        </div>
+    {% endfor %}
+</div>
+</body>
+</html>

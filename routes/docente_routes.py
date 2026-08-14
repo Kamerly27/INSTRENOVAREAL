@@ -802,3 +802,258 @@ def calificar_entrega(entrega_id):
         estudiante=estudiante,
         calificacion=calificacion
     )
+
+# ===== EXÁMENES EN LÍNEA RENOVA =====
+from datetime import datetime
+from flask import render_template, request, redirect, url_for, flash, session
+from database.db import db
+from models.usuario import Usuario
+from models.curso import Curso
+from models.modulo import Modulo
+from models.examen import Examen
+from models.pregunta_examen import PreguntaExamen
+from models.opcion_pregunta import OpcionPregunta
+from models.intento_examen import IntentoExamen
+from models.respuesta_examen import RespuestaExamen
+
+
+def _docente_id_examenes():
+    return session.get('usuario_id') or session.get('user_id') or session.get('id_usuario')
+
+
+def _parse_fecha_examen(valor):
+    if not valor:
+        return None
+    try:
+        return datetime.strptime(valor, "%Y-%m-%dT%H:%M")
+    except Exception:
+        return None
+
+
+def _docente_puede_examen(examen, docente_id):
+    modulo = Modulo.query.get(examen.modulo_id)
+    if not modulo:
+        return False
+
+    curso = Curso.query.get(modulo.curso_id)
+    if not curso:
+        return False
+
+    return str(getattr(curso, "docente_id", "")) == str(docente_id)
+
+
+@docente.route('/examenes-linea')
+def examenes_linea():
+    docente_id = _docente_id_examenes()
+
+    if not docente_id:
+        return redirect('/login')
+
+    cursos = Curso.query.filter_by(docente_id=docente_id).all()
+    datos = []
+
+    for curso in cursos:
+        modulos = Modulo.query.filter_by(curso_id=curso.id).all()
+        modulos_data = []
+
+        for modulo in modulos:
+            examenes = Examen.query.filter_by(modulo_id=modulo.id).order_by(Examen.id.desc()).all()
+            modulos_data.append({
+                "modulo": modulo,
+                "examenes": examenes
+            })
+
+        datos.append({
+            "curso": curso,
+            "modulos": modulos_data
+        })
+
+    return render_template('docente/examenes_linea.html', datos=datos)
+
+
+@docente.route('/modulo/<int:modulo_id>/examenes/nuevo', methods=['GET', 'POST'])
+def crear_examen_linea(modulo_id):
+    docente_id = _docente_id_examenes()
+
+    if not docente_id:
+        return redirect('/login')
+
+    modulo = Modulo.query.get_or_404(modulo_id)
+    curso = Curso.query.get(modulo.curso_id)
+
+    if not curso or str(getattr(curso, "docente_id", "")) != str(docente_id):
+        flash("No tiene permiso para crear exámenes en este módulo.", "danger")
+        return redirect('/docente/examenes-linea')
+
+    if request.method == 'POST':
+        titulo = request.form.get('titulo', '').strip()
+        descripcion = request.form.get('descripcion', '').strip()
+        fecha_inicio = _parse_fecha_examen(request.form.get('fecha_inicio'))
+        fecha_fin = _parse_fecha_examen(request.form.get('fecha_fin'))
+
+        if not titulo:
+            flash("Debe escribir el título del examen.", "warning")
+            return redirect(url_for('docente.crear_examen_linea', modulo_id=modulo_id))
+
+        examen = Examen(
+            titulo=titulo,
+            descripcion=descripcion,
+            enlace='',
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            activo=True,
+            modulo_id=modulo.id
+        )
+
+        db.session.add(examen)
+        db.session.commit()
+
+        flash("Examen creado. Ahora agregue las preguntas.", "success")
+        return redirect(url_for('docente.preguntas_examen_linea', examen_id=examen.id))
+
+    return render_template('docente/crear_examen_linea.html', modulo=modulo, curso=curso)
+
+
+@docente.route('/examenes/<int:examen_id>/preguntas')
+def preguntas_examen_linea(examen_id):
+    docente_id = _docente_id_examenes()
+
+    if not docente_id:
+        return redirect('/login')
+
+    examen = Examen.query.get_or_404(examen_id)
+
+    if not _docente_puede_examen(examen, docente_id):
+        flash("No tiene permiso para administrar este examen.", "danger")
+        return redirect('/docente/examenes-linea')
+
+    preguntas = PreguntaExamen.query.filter_by(examen_id=examen.id).order_by(PreguntaExamen.orden.asc(), PreguntaExamen.id.asc()).all()
+
+    opciones_por_pregunta = {}
+    for pregunta in preguntas:
+        opciones_por_pregunta[pregunta.id] = OpcionPregunta.query.filter_by(pregunta_id=pregunta.id).order_by(OpcionPregunta.orden.asc()).all()
+
+    return render_template(
+        'docente/preguntas_examen.html',
+        examen=examen,
+        preguntas=preguntas,
+        opciones_por_pregunta=opciones_por_pregunta
+    )
+
+
+@docente.route('/examenes/<int:examen_id>/preguntas/nueva', methods=['POST'])
+def agregar_pregunta_examen_linea(examen_id):
+    docente_id = _docente_id_examenes()
+
+    if not docente_id:
+        return redirect('/login')
+
+    examen = Examen.query.get_or_404(examen_id)
+
+    if not _docente_puede_examen(examen, docente_id):
+        flash("No tiene permiso para modificar este examen.", "danger")
+        return redirect('/docente/examenes-linea')
+
+    enunciado = request.form.get('enunciado', '').strip()
+    correcta = request.form.get('correcta', '').strip()
+
+    try:
+        puntos = float(request.form.get('puntos', '1'))
+    except Exception:
+        puntos = 1.0
+
+    opciones = []
+    for i in range(1, 5):
+        texto = request.form.get(f'opcion_{i}', '').strip()
+        if texto:
+            opciones.append((i, texto))
+
+    if not enunciado:
+        flash("Debe escribir la pregunta.", "warning")
+        return redirect(url_for('docente.preguntas_examen_linea', examen_id=examen.id))
+
+    if len(opciones) < 2:
+        flash("Debe escribir mínimo dos opciones de respuesta.", "warning")
+        return redirect(url_for('docente.preguntas_examen_linea', examen_id=examen.id))
+
+    if not correcta:
+        flash("Debe marcar cuál opción es correcta.", "warning")
+        return redirect(url_for('docente.preguntas_examen_linea', examen_id=examen.id))
+
+    orden = PreguntaExamen.query.filter_by(examen_id=examen.id).count() + 1
+
+    pregunta = PreguntaExamen(
+        examen_id=examen.id,
+        enunciado=enunciado,
+        tipo='seleccion_unica',
+        puntos=puntos,
+        orden=orden,
+        activo=True
+    )
+
+    db.session.add(pregunta)
+    db.session.flush()
+
+    for posicion, texto_opcion in opciones:
+        opcion = OpcionPregunta(
+            pregunta_id=pregunta.id,
+            texto=texto_opcion,
+            correcta=(str(posicion) == str(correcta)),
+            orden=posicion
+        )
+        db.session.add(opcion)
+
+    db.session.commit()
+
+    flash("Pregunta agregada correctamente.", "success")
+    return redirect(url_for('docente.preguntas_examen_linea', examen_id=examen.id))
+
+
+@docente.route('/preguntas-examen/<int:pregunta_id>/eliminar', methods=['POST'])
+def eliminar_pregunta_examen_linea(pregunta_id):
+    docente_id = _docente_id_examenes()
+
+    if not docente_id:
+        return redirect('/login')
+
+    pregunta = PreguntaExamen.query.get_or_404(pregunta_id)
+    examen = Examen.query.get_or_404(pregunta.examen_id)
+
+    if not _docente_puede_examen(examen, docente_id):
+        flash("No tiene permiso para eliminar esta pregunta.", "danger")
+        return redirect('/docente/examenes-linea')
+
+    RespuestaExamen.query.filter_by(pregunta_id=pregunta.id).delete()
+    OpcionPregunta.query.filter_by(pregunta_id=pregunta.id).delete()
+    db.session.delete(pregunta)
+    db.session.commit()
+
+    flash("Pregunta eliminada.", "success")
+    return redirect(url_for('docente.preguntas_examen_linea', examen_id=examen.id))
+
+
+@docente.route('/examenes/<int:examen_id>/resultados')
+def resultados_examen_linea(examen_id):
+    docente_id = _docente_id_examenes()
+
+    if not docente_id:
+        return redirect('/login')
+
+    examen = Examen.query.get_or_404(examen_id)
+
+    if not _docente_puede_examen(examen, docente_id):
+        flash("No tiene permiso para ver estos resultados.", "danger")
+        return redirect('/docente/examenes-linea')
+
+    intentos = IntentoExamen.query.filter_by(examen_id=examen.id).order_by(IntentoExamen.fecha_fin.desc()).all()
+
+    estudiantes = {}
+    for intento in intentos:
+        estudiantes[intento.estudiante_id] = Usuario.query.get(intento.estudiante_id)
+
+    return render_template(
+        'docente/resultados_examen.html',
+        examen=examen,
+        intentos=intentos,
+        estudiantes=estudiantes
+    )
