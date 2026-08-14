@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar examen</title>
+    <style>
+        body { font-family:Arial, sans-serif; background:#eef3f7; margin:0; color:#102a23; }
+        .wrap { max-width:850px; margin:35px auto; background:white; padding:30px; border-radius:22px; box-shadow:0 10px 30px rgba(0,0,0,.08); }
+        h1 { color:#064A33; }
+        label { display:block; margin-top:16px; font-weight:bold; }
+        input, textarea, select { width:100%; padding:12px; border:1px solid #d1d5db; border-radius:10px; margin-top:6px; box-sizing:border-box; }
+        textarea { min-height:150px; }
+        .btn { display:inline-block; padding:12px 16px; border-radius:10px; text-decoration:none; font-weight:bold; border:0; cursor:pointer; margin-top:18px; }
+        .btn-green { background:#064A33; color:white; }
+        .btn-light { background:#e8f5ef; color:#064A33; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Editar examen</h1>
+
+    <form method="POST">
+        <label>Título del examen</label>
+        <input type="text" name="titulo" value="{{ examen.titulo }}" required>
+
+        <label>Descripción o instrucciones</label>
+        <textarea name="descripcion">{{ examen.descripcion or '' }}</textarea>
+
+        <label>Fecha y hora de inicio</label>
+        <input type="datetime-local" name="fecha_inicio" value="{{ examen.fecha_inicio.strftime('%Y-%m-%dT%H:%M') if examen.fecha_inicio else '' }}">
+
+        <label>Fecha y hora de cierre</label>
+        <input type="datetime-local" name="fecha_fin" value="{{ examen.fecha_fin.strftime('%Y-%m-%dT%H:%M') if examen.fecha_fin else '' }}">
+
+        <label>Estado</label>
+        <select name="activo">
+            <option value="1" {% if examen.activo %}selected{% endif %}>Activo</option>
+            <option value="0" {% if not examen.activo %}selected{% endif %}>Inactivo</option>
+        </select>
+
+        <button class="btn btn-green" type="submit">Guardar cambios</button>
+        <a class="btn btn-light" href="/docente/modulo/{{ examen.modulo_id }}/examenes">Volver</a>
+    </form>
+</div>
+</body>
+</html>

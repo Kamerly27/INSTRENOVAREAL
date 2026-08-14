@@ -380,19 +380,28 @@ def eliminar_actividad(id):
 @login_required
 def examenes(modulo_id):
 
-    modulo = Modulo.query.get_or_404(modulo_id)
 
-    examenes = Examen.query.filter_by(
-        modulo_id=modulo_id
-    ).order_by(
-        Examen.fecha_creacion.desc()
-    ).all()
+    modulo = Modulo.query.get_or_404(modulo_id)
+    curso = Curso.query.get(modulo.curso_id)
+
+    examenes = Examen.query.filter_by(modulo_id=modulo.id).order_by(Examen.id.desc()).all()
+
+    conteo_preguntas = {}
+    conteo_intentos = {}
+
+    for examen in examenes:
+        conteo_preguntas[examen.id] = PreguntaExamen.query.filter_by(examen_id=examen.id).count()
+        conteo_intentos[examen.id] = IntentoExamen.query.filter_by(examen_id=examen.id).count()
 
     return render_template(
-        'docente/examenes.html',
+        'docente/examenes_modulo_linea.html',
         modulo=modulo,
-        examenes=examenes
+        curso=curso,
+        examenes=examenes,
+        conteo_preguntas=conteo_preguntas,
+        conteo_intentos=conteo_intentos
     )
+
 
 
 @docente.route('/modulo/<int:modulo_id>/examenes/crear', methods=['GET', 'POST'])
@@ -1115,3 +1124,74 @@ def resultados_examen_linea(examen_id):
         intentos=intentos,
         estudiantes=estudiantes
     )
+
+# ===== EDICIÓN Y ELIMINACIÓN LIMPIA DE EXÁMENES INTERNOS =====
+
+def _renova_parse_fecha_examen(valor):
+    if not valor:
+        return None
+
+    formatos = [
+        "%Y-%m-%dT%H:%M",
+        "%Y-%m-%d",
+        "%d/%m/%Y"
+    ]
+
+    for formato in formatos:
+        try:
+            return datetime.strptime(valor, formato)
+        except Exception:
+            pass
+
+    return None
+
+
+@docente.route('/examenes-linea/<int:examen_id>/editar', methods=['GET', 'POST'])
+def editar_examen_linea_directo(examen_id):
+    examen = Examen.query.get_or_404(examen_id)
+    modulo = Modulo.query.get(examen.modulo_id)
+    curso = Curso.query.get(modulo.curso_id) if modulo else None
+
+    if request.method == 'POST':
+        examen.titulo = request.form.get('titulo', '').strip()
+        examen.descripcion = request.form.get('descripcion', '').strip()
+        examen.fecha_inicio = _renova_parse_fecha_examen(request.form.get('fecha_inicio'))
+        examen.fecha_fin = _renova_parse_fecha_examen(request.form.get('fecha_fin'))
+        examen.activo = request.form.get('activo') == '1'
+
+        db.session.commit()
+
+        flash("Examen actualizado correctamente.", "success")
+        return redirect(f"/docente/modulo/{examen.modulo_id}/examenes")
+
+    return render_template(
+        'docente/editar_examen_linea.html',
+        examen=examen,
+        modulo=modulo,
+        curso=curso
+    )
+
+
+@docente.route('/examenes-linea/<int:examen_id>/eliminar', methods=['GET', 'POST'])
+def eliminar_examen_linea_directo(examen_id):
+    examen = Examen.query.get_or_404(examen_id)
+    modulo_id = examen.modulo_id
+
+    intentos = IntentoExamen.query.filter_by(examen_id=examen.id).all()
+
+    for intento in intentos:
+        RespuestaExamen.query.filter_by(intento_id=intento.id).delete()
+        db.session.delete(intento)
+
+    preguntas = PreguntaExamen.query.filter_by(examen_id=examen.id).all()
+
+    for pregunta in preguntas:
+        RespuestaExamen.query.filter_by(pregunta_id=pregunta.id).delete()
+        OpcionPregunta.query.filter_by(pregunta_id=pregunta.id).delete()
+        db.session.delete(pregunta)
+
+    db.session.delete(examen)
+    db.session.commit()
+
+    flash("Examen eliminado correctamente.", "success")
+    return redirect(f"/docente/modulo/{modulo_id}/examenes")

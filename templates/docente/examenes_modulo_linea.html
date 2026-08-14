@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Exámenes del módulo</title>
+    <style>
+        body { font-family: Arial, sans-serif; background:#eef3f7; margin:0; color:#102a23; }
+        .wrap { max-width:1150px; margin:35px auto; background:white; padding:28px; border-radius:22px; box-shadow:0 10px 30px rgba(0,0,0,.08); }
+        h1 { color:#064A33; margin-bottom:5px; }
+        .sub { color:#4b5563; margin-top:0; }
+        .top-actions { margin:22px 0; display:flex; gap:10px; flex-wrap:wrap; }
+        .btn { display:inline-block; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:bold; border:0; cursor:pointer; font-size:14px; }
+        .btn-green { background:#064A33; color:white; }
+        .btn-gold { background:#C79A22; color:white; }
+        .btn-light { background:#e8f5ef; color:#064A33; }
+        .btn-blue { background:#2563eb; color:white; }
+        .btn-red { background:#b91c1c; color:white; }
+        table { width:100%; border-collapse:collapse; margin-top:15px; }
+        th, td { padding:14px; border-bottom:1px solid #e5e7eb; text-align:left; vertical-align:top; }
+        th { background:#f8fafc; color:#1f2937; }
+        .desc { max-width:390px; line-height:1.35; color:#374151; }
+        .acciones { display:flex; flex-direction:column; gap:7px; min-width:170px; }
+        .estado { font-weight:bold; color:#064A33; }
+        .empty { padding:25px; background:#f8fafc; border-radius:14px; color:#6b7280; }
+        form { margin:0; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Exámenes del módulo</h1>
+    <p class="sub">
+        <strong>Curso:</strong> {{ curso.nombre if curso else 'Curso' }}<br>
+        <strong>Módulo:</strong> {{ modulo.titulo if modulo.titulo else modulo.nombre }}
+    </p>
+
+    <div class="top-actions">
+        <a class="btn btn-green" href="/docente/modulo/{{ modulo.id }}/examenes/crear">Crear nuevo examen</a>
+        <a class="btn btn-light" href="/docente/dashboard">Volver al panel docente</a>
+    </div>
+
+    {% if examenes %}
+        <table>
+            <tr>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Estado</th>
+                <th>Preguntas</th>
+                <th>Presentados</th>
+                <th>Acciones</th>
+            </tr>
+
+            {% for examen in examenes %}
+            <tr>
+                <td><strong>{{ examen.titulo }}</strong></td>
+                <td class="desc">{{ examen.descripcion }}</td>
+                <td>{{ examen.fecha_inicio.strftime('%d/%m/%Y %H:%M') if examen.fecha_inicio else 'Sin definir' }}</td>
+                <td>{{ examen.fecha_fin.strftime('%d/%m/%Y %H:%M') if examen.fecha_fin else 'Sin definir' }}</td>
+                <td class="estado">{{ 'Activo' if examen.activo else 'Inactivo' }}</td>
+                <td>{{ conteo_preguntas[examen.id] }}</td>
+                <td>{{ conteo_intentos[examen.id] }}</td>
+                <td>
+                    <div class="acciones">
+                        <a class="btn btn-gold" href="{{ url_for('docente.preguntas_examen_linea', examen_id=examen.id) }}">Preguntas</a>
+                        <a class="btn btn-blue" href="{{ url_for('docente.resultados_examen_linea', examen_id=examen.id) }}">Resultados</a>
+                        <a class="btn btn-light" href="{{ url_for('docente.editar_examen_linea_directo', examen_id=examen.id) }}">Editar</a>
+
+                        <form method="POST" action="{{ url_for('docente.eliminar_examen_linea_directo', examen_id=examen.id) }}">
+                            <button class="btn btn-red" type="submit" onclick="return confirm('¿Eliminar este examen y sus preguntas?')">
+                                Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <div class="empty">
+            Este módulo todavía no tiene exámenes creados.
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>
